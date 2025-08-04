@@ -540,9 +540,18 @@ class GameUI {
         // Анимация полета монеты
         setTimeout(() => {
             coin.classList.add('coin-fly');
-            // Устанавливаем конечную позицию через CSS переменные
+            
+            // Создаем случайные завихрения для каждой монеты
+            const swirlIntensity = 30 + Math.random() * 40; // 30-70px интенсивность завихрений
+            const swirlDirection = Math.random() > 0.5 ? 1 : -1; // Случайное направление
+            const swirlOffset = Math.random() * 20 - 10; // Случайное смещение
+            
+            // Устанавливаем конечную позицию через CSS переменные с завихрениями
             coin.style.setProperty('--end-x', `${endX - startX - randomOffsetX}px`);
             coin.style.setProperty('--end-y', `${endY - startY - randomOffsetY}px`);
+            coin.style.setProperty('--swirl-intensity', `${swirlIntensity}px`);
+            coin.style.setProperty('--swirl-direction', `${swirlDirection}`);
+            coin.style.setProperty('--swirl-offset', `${swirlOffset}px`);
         }, 100);
 
         // Звуковой эффект для монеты (только для каждой пятой монеты)
