@@ -157,9 +157,9 @@ class Player {
         const gameObjectsRect = gameObjects.getBoundingClientRect();
         const playerRect = this.element.getBoundingClientRect();
         
-        // Позиция blast относительно game-objects (из центра героя по вертикали)
-        const blastX = playerRect.left - gameObjectsRect.left + playerRect.width / 2 - blastSize / 2;
-        const blastY = playerRect.bottom - gameObjectsRect.bottom + playerRect.height / 2 - blastSize / 2;
+        // Позиция blast относительно game-objects (из центра героя)
+        const blastX = playerRect.left - gameObjectsRect.left + playerRect.width / 2;
+        const blastY = playerRect.bottom - gameObjectsRect.bottom + playerRect.height / 2;
         
         blast.style.cssText = `
             position: absolute;
@@ -170,8 +170,8 @@ class Player {
             background-repeat: no-repeat;
             background-position: center;
             z-index: 16;
-            left: ${blastX}px;
-            bottom: ${blastY}px;
+            left: ${blastX - blastSize / 2}px;
+            bottom: ${blastY - blastSize / 2}px;
             image-rendering: pixelated;
         `;
 
@@ -186,7 +186,7 @@ class Player {
             const monsterRect = monsterElement.getBoundingClientRect();
             const blastRect = blast.getBoundingClientRect();
             
-            // Вычисляем позицию монстра относительно game-objects
+            // Вычисляем позицию центра монстра относительно game-objects
             const monsterX = monsterRect.left - gameObjectsRect.left + monsterRect.width / 2;
             const monsterY = monsterRect.bottom - gameObjectsRect.bottom + monsterRect.height / 2;
             
@@ -194,11 +194,12 @@ class Player {
             const blastX = blastRect.left - gameObjectsRect.left;
             const blastY = blastRect.bottom - gameObjectsRect.bottom;
             
-            // Вычисляем смещение для анимации
+            // Вычисляем смещение для анимации (blast летит к центру монстра по горизонтали)
             const endX = monsterX - blastX;
-            const endY = monsterY - blastY;
+            const endY = 0; // Blast летит на той же высоте
             
             console.log('Blast летит от:', blastX, blastY, 'к:', monsterX, monsterY);
+            console.log('Размеры blast:', blastSize, 'размеры монстра:', monsterRect.width, monsterRect.height);
             
             // Анимация полета blast к монстру (еще более замедленная)
             blast.style.transition = 'all 0.8s ease-out';
@@ -244,16 +245,23 @@ class Player {
         const gameObjects = document.getElementById('game-objects');
         const gameObjectsRect = gameObjects.getBoundingClientRect();
         
+        console.log('Позиция монстра:', monsterRect.left, monsterRect.bottom);
+        console.log('Позиция game-objects:', gameObjectsRect.left, gameObjectsRect.bottom);
+        console.log('Размеры монстра:', monsterRect.width, monsterRect.height);
+        
         // Позиция центра монстра относительно game-objects
         const monsterCenterX = monsterRect.left - gameObjectsRect.left + monsterRect.width / 2;
         const monsterCenterY = monsterRect.bottom - gameObjectsRect.bottom + monsterRect.height / 2;
         
         // Позиция взрыва (центр взрыва совпадает с центром монстра)
-        const burstX = monsterCenterX - burstSize / 2;
-        const burstY = monsterCenterY - burstSize / 2;
+        const burstX = monsterCenterX;
+        const burstY = monsterCenterY;
         
         console.log('Центр монстра:', monsterCenterX, monsterCenterY);
-        console.log('Позиция взрыва:', burstX, burstY);
+        console.log('Позиция взрыва:', burstX, burstY, 'размер взрыва:', burstSize);
+        
+        console.log('Центр монстра:', monsterCenterX, monsterCenterY);
+        console.log('Позиция взрыва:', burstX, burstY, 'размер взрыва:', burstSize);
         
         console.log('Взрыв создается на позиции монстра:', burstX, burstY, 'размер взрыва:', burstSize);
         
@@ -268,8 +276,8 @@ class Player {
             background-repeat: no-repeat;
             background-position: center;
             z-index: 17;
-            left: ${burstX}px;
-            bottom: ${burstY}px;
+            left: ${burstX - burstSize / 2}px;
+            bottom: ${burstY - burstSize / 2}px;
             image-rendering: pixelated;
         `;
 
