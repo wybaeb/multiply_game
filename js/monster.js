@@ -18,6 +18,9 @@ class Monster {
         this.attackCooldownTime = 2000; // 2 секунды
         this.lastAttackTime = 0;
         this.spriteSize = this.calculateSpriteSize();
+        this.monsterType = 'monstr1'; // Текущий тип монстра
+        this.monsterTypes = ['monstr1', 'monstr2']; // Доступные типы монстров
+        this.currentMonsterIndex = 0; // Индекс текущего монстра
         this.initResizeHandler();
         this.setPosition(this.position.x, this.position.y);
     }
@@ -72,6 +75,7 @@ class Monster {
      * Инициализация монстра
      */
     init() {
+        this.updateMonsterSprites();
         this.updateSpriteSize();
         this.hide();
     }
@@ -82,6 +86,7 @@ class Monster {
     show() {
         this.element.classList.remove('hidden');
         this.updateSpriteSize();
+        this.updateMonsterSprites(); // Обновляем спрайты для текущего типа монстра
         this.startWalking();
         this.element.classList.add('monster-appear');
     }
@@ -270,12 +275,18 @@ class Monster {
      */
     animate(animationClass) {
         if (this.sprite) {
-            // Убираем все классы анимаций
+            // Убираем все классы анимаций для всех типов монстров
             this.sprite.classList.remove('monster-walking', 'monster-attacking');
+            this.monsterTypes.forEach(type => {
+                this.sprite.classList.remove(`monster-walking-${type}`, `monster-attacking-${type}`);
+            });
             
-            // Добавляем нужный класс
+            // Добавляем нужный класс для текущего типа монстра
             if (animationClass !== 'idle') {
-                this.sprite.classList.add(animationClass);
+                const specificClass = animationClass === 'monster-walking' ? 
+                    `monster-walking-${this.monsterType}` : 
+                    `monster-attacking-${this.monsterType}`;
+                this.sprite.classList.add(specificClass);
             }
         }
     }
@@ -394,6 +405,7 @@ class Monster {
         this.lastAttackTime = 0;
         this.setPosition(75, 5);
         this.updateSpriteSize();
+        this.updateMonsterSprites(); // Обновляем спрайты для текущего типа монстра
         this.animate('idle');
         this.element.classList.remove('monster-appear', 'monster-disappear');
         this.element.style.left = '75%'; // Явно устанавливаем начальную позицию
@@ -560,6 +572,63 @@ class Monster {
         
         // Запускаем отход
         requestAnimationFrame(retreatFromPlayer);
+    }
+
+    /**
+     * Переключение на следующий тип монстра
+     */
+    switchMonsterType() {
+        this.currentMonsterIndex = (this.currentMonsterIndex + 1) % this.monsterTypes.length;
+        this.monsterType = this.monsterTypes[this.currentMonsterIndex];
+        this.updateMonsterSprites();
+        console.log(`Переключился на монстра типа: ${this.monsterType}, индекс: ${this.currentMonsterIndex}`);
+    }
+
+    /**
+     * Обновление спрайтов монстра в CSS
+     */
+    updateMonsterSprites() {
+        const style = document.createElement('style');
+        style.id = 'monster-sprites-style';
+        
+        // Удаляем старый стиль, если он есть
+        const oldStyle = document.getElementById('monster-sprites-style');
+        if (oldStyle) {
+            oldStyle.remove();
+        }
+        
+        style.textContent = `
+            @keyframes monster-walk-${this.monsterType} {
+                0% { background-image: url('sprites/${this.monsterType}/walk1.png'); }
+                33% { background-image: url('sprites/${this.monsterType}/walk2.png'); }
+                66% { background-image: url('sprites/${this.monsterType}/walk3.png'); }
+                100% { background-image: url('sprites/${this.monsterType}/walk1.png'); }
+            }
+            
+            @keyframes monster-attack-${this.monsterType} {
+                0% { background-image: url('sprites/${this.monsterType}/attack1.png'); }
+                33% { background-image: url('sprites/${this.monsterType}/attack2.png'); }
+                66% { background-image: url('sprites/${this.monsterType}/attack3.png'); }
+                100% { background-image: url('sprites/${this.monsterType}/walk1.png'); }
+            }
+            
+            .monster-walking-${this.monsterType} {
+                animation: monster-walk-${this.monsterType} 0.8s steps(3) infinite;
+                background-size: contain !important;
+                background-repeat: no-repeat !important;
+                background-position: center bottom !important;
+            }
+            
+            .monster-attacking-${this.monsterType} {
+                animation: monster-attack-${this.monsterType} 0.6s steps(3) forwards;
+                background-size: contain !important;
+                background-repeat: no-repeat !important;
+                background-position: center bottom !important;
+            }
+        `;
+        
+        document.head.appendChild(style);
+        console.log(`Обновлены спрайты для монстра типа: ${this.monsterType}`);
     }
 }
 

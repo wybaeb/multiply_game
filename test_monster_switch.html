@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест переключения монстров</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #333;
+            color: white;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .monster-display {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #666;
+            margin: 20px 0;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .info {
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Тест переключения монстров</h1>
+        
+        <div class="info">
+            <h3>Текущий монстр: <span id="current-monster">monstr1</span></h3>
+            <p>Индекс: <span id="monster-index">0</span></p>
+        </div>
+        
+        <div class="monster-display" id="monster-sprite"></div>
+        
+        <div>
+            <button onclick="switchMonster()">Переключить монстра</button>
+            <button onclick="startWalking()">Начать ходьбу</button>
+            <button onclick="startAttacking()">Начать атаку</button>
+            <button onclick="stopAnimation()">Остановить анимацию</button>
+        </div>
+        
+        <div class="info">
+            <h3>Логи:</h3>
+            <div id="logs" style="height: 200px; overflow-y: auto; background: #222; padding: 10px; font-family: monospace; font-size: 12px;"></div>
+        </div>
+    </div>
+
+    <script src="js/monster.js"></script>
+    <script>
+        // Переопределяем console.log для отображения в интерфейсе
+        const originalLog = console.log;
+        const logsDiv = document.getElementById('logs');
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const logEntry = document.createElement('div');
+            logEntry.textContent = new Date().toLocaleTimeString() + ': ' + args.join(' ');
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        };
+
+        // Инициализируем монстра
+        window.monster.init();
+        
+        function updateDisplay() {
+            document.getElementById('current-monster').textContent = window.monster.monsterType;
+            document.getElementById('monster-index').textContent = window.monster.currentMonsterIndex;
+        }
+        
+        function switchMonster() {
+            window.monster.switchMonsterType();
+            updateDisplay();
+        }
+        
+        function startWalking() {
+            window.monster.startWalking();
+        }
+        
+        function startAttacking() {
+            window.monster.attack();
+        }
+        
+        function stopAnimation() {
+            window.monster.animate('idle');
+        }
+        
+        // Обновляем отображение при загрузке
+        updateDisplay();
+    </script>
+</body>
+</html> 

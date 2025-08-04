@@ -554,6 +554,9 @@ class GameEngine {
         // Скрываем монстра
         window.monster.hide();
 
+        // Переключаем тип монстра для следующего спавна
+        window.monster.switchMonsterType();
+
         // Возвращаемся к музыке игры
         if (window.musicManager) {
             window.musicManager.playGameMusic();
