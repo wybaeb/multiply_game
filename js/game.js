@@ -345,10 +345,9 @@ class GameEngine {
         
         // Анимации
         window.gameUI.animateWrongAnswer();
-        window.monster.attack();
-
-        // Урон игроку
-        window.player.takeMonsterDamage();
+        
+        // Монстр сначала подбегает к игроку, потом атакует
+        window.monster.approachAndAttack();
 
         // Скрываем UI
         window.gameUI.hideMathProblem();
@@ -443,8 +442,8 @@ class GameEngine {
         // Анимация штрафа
         window.gameUI.animatePenalty(penalty);
         
-        // Урон игроку
-        window.player.takeMonsterDamage();
+        // Монстр сначала подбегает к игроку, потом атакует
+        window.monster.approachAndAttack();
         
         // Скрываем UI
         window.gameUI.hideMathProblem();

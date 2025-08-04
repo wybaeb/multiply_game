@@ -143,16 +143,18 @@ class Monster {
         // Начальная позиция монстра (75%)
         const startPosition = 75;
         
+        // Позиция для атаки - монстр должен быть достаточно близко к герою
+        const attackPosition = playerCenter + 10; // 10% от центра героя
+        
         // Вычисляем целевую позицию на основе времени
         let targetPosition;
         if (remainingTime <= 0) {
-            // Когда время истекло, монстр заходит на середину героя
-            // Левая граница монстра = центр героя
-            targetPosition = playerCenter;
+            // Когда время истекло, монстр заходит на позицию атаки
+            targetPosition = attackPosition;
         } else {
             // Пропорциональное приближение
             const timeProgress = (maxTime - remainingTime) / maxTime; // 0 до 1
-            const distanceToPlayer = startPosition - playerCenter;
+            const distanceToPlayer = startPosition - attackPosition;
             targetPosition = startPosition - (distanceToPlayer * timeProgress);
         }
         
@@ -173,14 +175,13 @@ class Monster {
             // Проверяем, что newLeft не NaN
             if (!isNaN(newLeft) && isFinite(newLeft)) {
                 this.element.style.left = `${newLeft}%`;
-                console.log(`Monster: time=${remainingTime}, moved from ${currentLeft.toFixed(1)}% to ${newLeft.toFixed(1)}% (target: ${targetPosition.toFixed(1)}%)`);
             } else {
                 console.error(`Invalid newLeft value: ${newLeft}, currentLeft: ${currentLeft}, moveStep: ${moveStep}, moveSpeed: ${this.moveSpeed}`);
             }
         }
         
-        // Если время истекло и монстр достиг позиции героя, атакуем
-        if (remainingTime <= 0 && currentLeft <= playerCenter) {
+        // Если время истекло и монстр достиг позиции атаки, атакуем
+        if (remainingTime <= 0 && currentLeft <= attackPosition) {
             this.stopWalking();
             this.attack();
         }
@@ -439,6 +440,61 @@ class Monster {
      */
     getMoveSpeed() {
         return this.moveSpeed;
+    }
+
+    /**
+     * Подбегание к игроку и атака
+     */
+    approachAndAttack() {
+        // Вычисляем позицию игрока
+        const playerPosition = 20; // Позиция героя в процентах
+        const playerSpriteWidth = this.spriteSize.width; // Ширина спрайта героя
+        const screenWidth = window.innerWidth;
+        const playerSpriteWidthPercent = (playerSpriteWidth / screenWidth) * 100;
+        const playerCenter = playerPosition + (playerSpriteWidthPercent / 2);
+        
+        // Позиция для атаки - монстр должен быть достаточно близко к герою
+        const attackPosition = playerCenter + 10; // 10% от центра героя
+        
+        const currentLeft = parseFloat(this.element.style.left) || 75;
+        
+        // Если монстр уже достаточно близко, сразу атакуем
+        if (currentLeft <= attackPosition) {
+            this.attack();
+            // Урон игроку
+            window.player.takeMonsterDamage();
+            return;
+        }
+        
+        // Иначе сначала подбегаем
+        this.startWalking();
+        
+        // Функция для приближения к игроку
+        const approachPlayer = () => {
+            const currentPos = parseFloat(this.element.style.left) || 75;
+            
+            if (currentPos > attackPosition) {
+                const moveSpeed = this.moveSpeed || 2;
+                const moveStep = moveSpeed * 0.3; // Быстрое приближение
+                const newLeft = currentPos - moveStep;
+                
+                if (!isNaN(newLeft) && isFinite(newLeft)) {
+                    this.element.style.left = `${newLeft}%`;
+                    
+                    // Продолжаем приближение
+                    requestAnimationFrame(approachPlayer);
+                }
+            } else {
+                // Достигли позиции атаки, атакуем
+                this.stopWalking();
+                this.attack();
+                // Урон игроку
+                window.player.takeMonsterDamage();
+            }
+        };
+        
+        // Запускаем приближение
+        requestAnimationFrame(approachPlayer);
     }
 }
 
