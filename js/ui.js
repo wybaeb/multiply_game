@@ -495,13 +495,15 @@ class GameUI {
             coin.style.setProperty('--end-y', `${endY - startY - randomOffsetY}px`);
         }, 100);
 
-        // Звуковой эффект для монеты
-        try {
-            const coinSound = new Audio('sprites/music/catch.mp3');
-            coinSound.volume = 0.3; // Уменьшаем громкость
-            coinSound.play().catch(e => console.log('Не удалось воспроизвести звук монеты:', e));
-        } catch (e) {
-            console.log('Ошибка создания звука монеты:', e);
+        // Звуковой эффект для монеты (только для каждой пятой монеты)
+        if (Math.random() < 0.2) { // 20% вероятность = 1/5 монет
+            try {
+                const coinSound = new Audio('sprites/music/smrpg_coin.wav');
+                coinSound.volume = 0.4; // Умеренная громкость
+                coinSound.play().catch(e => console.log('Не удалось воспроизвести звук монеты:', e));
+            } catch (e) {
+                console.log('Ошибка создания звука монеты:', e);
+            }
         }
 
         // Удаление монеты
