@@ -108,7 +108,19 @@ class GameEngine {
         
         this.gameState = 'RUNNING';
         this.isGameRunning = true;
-        this.currentScore = 0; // Сбрасываем счетчик для новой игры
+        
+        // Загружаем сохраненные данные
+        const gameData = window.gameStorage.loadGameData();
+        
+        // Если есть сохраненные очки > 0, используем их, иначе начинаем с 0
+        if (gameData.totalScore > 0) {
+            this.currentScore = gameData.totalScore;
+            console.log('Продолжаем игру с очками:', this.currentScore);
+        } else {
+            this.currentScore = 0;
+            console.log('Начинаем новую игру с 0 очков');
+        }
+        
         this.timer = 60;
         this.combatActive = false;
         this.lastAnswerCorrect = false;
@@ -146,6 +158,16 @@ class GameEngine {
         
         this.isGameRunning = false;
         this.gameState = 'MENU';
+
+        // Сохраняем текущие очки, если они > 0
+        if (this.currentScore > 0) {
+            console.log('Сохраняем очки при остановке игры:', this.currentScore);
+            window.gameStorage.updateScore(0); // Обновляем только totalScore, не добавляя к нему
+            // Принудительно устанавливаем сохраненные очки
+            const gameData = window.gameStorage.loadGameData();
+            gameData.totalScore = this.currentScore;
+            window.gameStorage.saveGameData(gameData);
+        }
 
         // Останавливаем все таймеры
         this.stopTimer();

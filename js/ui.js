@@ -127,7 +127,12 @@ class GameUI {
     bindEvents() {
         // Кнопка сброса
         this.elements.resetBtn.addEventListener('click', () => {
-            this.showMenu();
+            // Останавливаем игру, если она запущена
+            if (window.gameEngine && window.gameEngine.isGameActive()) {
+                window.gameEngine.stopGame();
+            } else {
+                this.showMenu();
+            }
         });
 
         // Кнопки клавиатуры
@@ -293,6 +298,15 @@ class GameUI {
             }
             if (this.elements.totalScore) {
                 this.elements.totalScore.textContent = gameData.totalScore;
+            }
+            
+            // Обновляем текст кнопки в зависимости от наличия сохраненных очков
+            if (this.elements.startGameBtn) {
+                if (gameData.totalScore > 0) {
+                    this.elements.startGameBtn.textContent = 'Продолжить игру';
+                } else {
+                    this.elements.startGameBtn.textContent = 'Начать игру';
+                }
             }
         }
     }
