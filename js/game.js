@@ -101,6 +101,7 @@ class GameEngine {
         this.currentScore = 0;
         this.timer = 60;
         this.combatActive = false;
+        this.lastAnswerCorrect = false;
 
         // Сброс UI
         window.gameUI.reset();
@@ -302,8 +303,13 @@ class GameEngine {
         window.gameUI.hideKeyboard();
         window.gameUI.hideInput();
 
-        // Анимация победы
-        this.victoryAnimation();
+        // Проверяем, не стали ли очки отрицательными после добавления очков
+        if (this.currentScore < 0) {
+            this.handleGameOver('Очки стали отрицательными! Игра окончена!');
+        } else {
+            // Анимация победы
+            this.victoryAnimation();
+        }
 
         // Сохраняем прогресс
         window.gameStorage.updateScore(points);
@@ -346,9 +352,13 @@ class GameEngine {
         window.gameUI.hideKeyboard();
         window.gameUI.hideInput();
 
-        // Проверяем здоровье игрока
-        if (!window.player.isAlive()) {
-            this.handlePlayerDeath();
+        // Проверяем здоровье игрока и отрицательные очки
+        if (!window.player.isAlive() || this.currentScore < 0) {
+            if (this.currentScore < 0) {
+                this.handleGameOver('Очки стали отрицательными! Игра окончена!');
+            } else {
+                this.handlePlayerDeath();
+            }
         } else {
             // Продолжаем игру с того же уровня
             setTimeout(() => {
@@ -392,6 +402,21 @@ class GameEngine {
     }
 
     /**
+     * Обработка окончания игры (общий метод)
+     */
+    handleGameOver(message) {
+        console.log('Игра окончена:', message);
+        
+        window.player.defeatAnimation();
+        window.gameUI.showMessage(message, 'error');
+
+        // Останавливаем игру через некоторое время
+        setTimeout(() => {
+            this.stopGame();
+        }, 3000);
+    }
+
+    /**
      * Обработка окончания времени
      */
     handleTimeUp() {
@@ -423,9 +448,13 @@ class GameEngine {
         window.gameUI.hideKeyboard();
         window.gameUI.hideInput();
         
-        // Проверяем здоровье игрока
-        if (!window.player.isAlive()) {
-            this.handlePlayerDeath();
+        // Проверяем здоровье игрока и отрицательные очки
+        if (!window.player.isAlive() || this.currentScore < 0) {
+            if (this.currentScore < 0) {
+                this.handleGameOver('Очки стали отрицательными! Игра окончена!');
+            } else {
+                this.handlePlayerDeath();
+            }
         } else {
             // Продолжаем игру с того же уровня
             setTimeout(() => {
