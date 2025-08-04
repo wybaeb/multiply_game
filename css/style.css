@@ -94,7 +94,7 @@ body {
 
 #player {
     left: 20%;
-    bottom: calc(20% + 50px);
+    bottom: 5%;
     z-index: 15;
 }
 
@@ -106,7 +106,7 @@ body {
 
 #monster {
     right: -150px;
-    bottom: calc(20% + 50px);
+    bottom: 5%;
     z-index: 14;
 }
 
