@@ -316,7 +316,7 @@ class Monster {
         this.isAttacking = false;
         this.isMoving = false;
         this.lastAttackTime = 0;
-        this.setPosition(80, 20);
+        this.setPosition(80, 5);
         this.updateSpriteSize();
         this.animate('idle');
         this.element.classList.remove('monster-appear', 'monster-disappear');

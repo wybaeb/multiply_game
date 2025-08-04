@@ -322,7 +322,7 @@ class Player {
         this.isAttacking = false;
         this.isMoving = false;
         this.lastAttackTime = 0;
-        this.setPosition(20, 20);
+        this.setPosition(20, 5);
         this.updateSpriteSize();
         this.animate('idle');
     }
