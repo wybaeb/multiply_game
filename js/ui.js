@@ -68,6 +68,20 @@ class GameUI {
     initResizeHandler() {
         window.addEventListener('resize', () => {
             this.updateUIScaling();
+            // Обновляем позицию поля ввода при изменении размера окна
+            if (this.isInputVisible) {
+                setTimeout(() => this.updateInputWidth(), 100);
+            }
+        });
+        
+        // Обработчик изменения ориентации
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                this.updateUIScaling();
+                if (this.isInputVisible) {
+                    this.updateInputWidth();
+                }
+            }, 500);
         });
     }
 
