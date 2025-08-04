@@ -16,6 +16,7 @@ class GameEngine {
         this.monsterSpawnDelay = 2000; // 2 секунды
         this.combatActive = false;
         this.victoryAnimationTimer = null;
+        this.lastAnswerCorrect = false; // Флаг для отслеживания правильности последнего ответа
         
         this.initialize();
     }
@@ -231,6 +232,7 @@ class GameEngine {
         
         this.combatActive = true;
         this.timer = 60; // Сброс таймера
+        this.lastAnswerCorrect = false; // Сбрасываем флаг правильности ответа
         window.monster.show();
 
         // Останавливаем движение персонажа на короткое время
@@ -275,6 +277,9 @@ class GameEngine {
     handleCorrectAnswer(result) {
         console.log('Правильный ответ!');
         
+        // Устанавливаем флаг правильного ответа
+        this.lastAnswerCorrect = true;
+        
         // Останавливаем таймер
         this.stopTimer();
         
@@ -310,16 +315,28 @@ class GameEngine {
     handleWrongAnswer(result) {
         console.log('Неправильный ответ!');
         
+        // Устанавливаем флаг неправильного ответа
+        this.lastAnswerCorrect = false;
+        
         // Останавливаем таймер
         this.stopTimer();
+        
+        // Вычисляем штраф: 500 очков + номер уровня
+        const penalty = 500 + this.currentLevel;
+        this.currentScore -= penalty;
+        
+        // Обновляем отображение очков
+        window.gameUI.updateScore(this.currentScore);
+        
+        // Показываем сообщение о штрафе
+        window.gameUI.showMessage(`Неправильный ответ! Штраф: -${penalty} очков`, 'error');
+        
+        // Анимация штрафа
+        window.gameUI.animatePenalty(penalty);
         
         // Анимации
         window.gameUI.animateWrongAnswer();
         window.monster.attack();
-
-        // Обновляем очки
-        this.currentScore += result.points; // Отрицательные очки
-        window.gameUI.updateScore(this.currentScore);
 
         // Урон игроку
         window.player.takeMonsterDamage();
@@ -333,12 +350,14 @@ class GameEngine {
         if (!window.player.isAlive()) {
             this.handlePlayerDeath();
         } else {
-            // Продолжаем игру
-            this.continueAfterCombat();
+            // Продолжаем игру с того же уровня
+            setTimeout(() => {
+                this.continueAfterCombat();
+            }, 2000);
         }
 
-        // Сохраняем прогресс
-        window.gameStorage.updateScore(result.points);
+        // Сохраняем прогресс (отрицательные очки)
+        window.gameStorage.updateScore(-penalty);
     }
 
     /**
@@ -378,13 +397,44 @@ class GameEngine {
     handleTimeUp() {
         console.log('Время истекло!');
         
+        // Устанавливаем флаг неправильного ответа
+        this.lastAnswerCorrect = false;
+        
         this.stopTimer();
-        window.gameUI.showMessage('Время истекло!', 'warning');
-
-        // Останавливаем игру через некоторое время
-        setTimeout(() => {
-            this.stopGame();
-        }, 2000);
+        
+        // Вычисляем штраф: 500 очков + номер уровня
+        const penalty = 500 + this.currentLevel;
+        this.currentScore -= penalty;
+        
+        // Обновляем отображение очков
+        window.gameUI.updateScore(this.currentScore);
+        
+        // Показываем сообщение о штрафе
+        window.gameUI.showMessage(`Время истекло! Штраф: -${penalty} очков`, 'warning');
+        
+        // Анимация штрафа
+        window.gameUI.animatePenalty(penalty);
+        
+        // Урон игроку
+        window.player.takeMonsterDamage();
+        
+        // Скрываем UI
+        window.gameUI.hideMathProblem();
+        window.gameUI.hideKeyboard();
+        window.gameUI.hideInput();
+        
+        // Проверяем здоровье игрока
+        if (!window.player.isAlive()) {
+            this.handlePlayerDeath();
+        } else {
+            // Продолжаем игру с того же уровня
+            setTimeout(() => {
+                this.continueAfterCombat();
+            }, 2000);
+        }
+        
+        // Сохраняем прогресс (отрицательные очки)
+        window.gameStorage.updateScore(-penalty);
     }
 
     /**
@@ -403,8 +453,13 @@ class GameEngine {
         // Запускаем спавн следующего монстра
         this.startMonsterSpawn();
 
-        // Проверяем переход к следующей группе сумм
-        this.checkSumGroupTransition();
+        // Проверяем переход к следующей группе сумм только при правильном ответе
+        if (this.lastAnswerCorrect) {
+            this.checkSumGroupTransition();
+        } else {
+            // При неправильном ответе или истечении времени остаемся на том же уровне
+            console.log('Остаемся на том же уровне из-за неправильного ответа');
+        }
     }
 
     /**

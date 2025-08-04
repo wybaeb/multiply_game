@@ -545,6 +545,72 @@ class GameUI {
     }
 
     /**
+     * Анимация штрафа
+     */
+    animatePenalty(penalty) {
+        // Создаем элемент для отображения штрафа
+        const penaltyElement = document.createElement('div');
+        penaltyElement.className = 'penalty-animation';
+        penaltyElement.textContent = `-${penalty}`;
+        
+        // Адаптивный размер шрифта
+        const fontSize = Math.max(16, Math.min(32, Math.min(window.innerWidth, window.innerHeight) / 40));
+        
+        // Получаем позицию счетчика очков
+        const scoreContainer = document.getElementById('score-container');
+        let startX, startY;
+        
+        if (scoreContainer) {
+            const scoreRect = scoreContainer.getBoundingClientRect();
+            startX = scoreRect.left + scoreRect.width / 2;
+            startY = scoreRect.top + scoreRect.height / 2;
+        } else {
+            // Fallback позиции
+            startX = window.innerWidth - 50;
+            startY = 50;
+        }
+        
+        penaltyElement.style.cssText = `
+            position: fixed;
+            font-size: ${fontSize}px;
+            font-weight: bold;
+            color: #ff4444;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 40;
+            left: ${startX}px;
+            top: ${startY}px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 1;
+        `;
+
+        document.body.appendChild(penaltyElement);
+
+        // Анимация появления и исчезновения
+        setTimeout(() => {
+            penaltyElement.style.transition = 'all 1.5s ease-out';
+            penaltyElement.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            penaltyElement.style.opacity = '0';
+        }, 100);
+
+        // Звуковой эффект для штрафа
+        try {
+            const penaltySound = new Audio('sprites/music/catch.mp3');
+            penaltySound.volume = 0.3;
+            penaltySound.play().catch(e => console.log('Не удалось воспроизвести звук штрафа:', e));
+        } catch (e) {
+            console.log('Ошибка создания звука штрафа:', e);
+        }
+
+        // Удаление элемента штрафа
+        setTimeout(() => {
+            if (penaltyElement.parentNode) {
+                penaltyElement.parentNode.removeChild(penaltyElement);
+            }
+        }, 1600);
+    }
+
+    /**
      * Показ персонажа
      */
     showPlayer() {

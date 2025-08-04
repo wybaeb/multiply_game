@@ -590,4 +590,31 @@ body {
 
 .coin-bounce {
     animation: coin-bounce 0.3s ease-in-out;
+}
+
+/* Анимации для штрафа */
+@keyframes penalty-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+@keyframes penalty-fade {
+    0% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
+.penalty-animation {
+    animation: penalty-shake 0.3s ease-in-out;
+    font-weight: bold;
+    color: #ff4444;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    z-index: 40;
 } 
