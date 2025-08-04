@@ -607,8 +607,8 @@ class GameUI {
      * Анимация монет при штрафе
      */
     animatePenaltyCoins(penalty) {
-        // Вычисляем количество монет: штраф деленный на 5
-        const coinCount = Math.floor(penalty / 5);
+        // Вычисляем количество монет: минимум 3, максимум 8 монет
+        const coinCount = Math.max(3, Math.min(8, Math.floor(penalty / 10) + 3));
         
         // Получаем позицию игрока для начала анимации
         const playerElement = document.getElementById('player');
@@ -624,14 +624,14 @@ class GameUI {
             startY = window.innerHeight * 0.6; // 60% от высоты экрана
         }
         
-        // Создаем все монеты одновременно
+        // Создаем все монеты одновременно как салют
         for (let i = 0; i < coinCount; i++) {
             this.createPenaltyCoinAnimation(startX, startY);
         }
     }
 
     /**
-     * Создание анимации монеты при штрафе
+     * Создание анимации монеты при штрафе с физикой
      */
     createPenaltyCoinAnimation(startX, startY) {
         const coin = document.createElement('div');
@@ -644,11 +644,28 @@ class GameUI {
         const coinSprites = ['coin1.png', 'coin2.png', 'coin3.png', 'coin4.png', 'coin5.png'];
         const randomSprite = coinSprites[Math.floor(Math.random() * coinSprites.length)];
         
-        // Случайное направление полета вверх и в стороны
-        const angle = (Math.random() - 0.5) * Math.PI; // от -90 до +90 градусов (только вверх)
-        const distance = 150 + Math.random() * 100; // 150-250px
-        const endX = startX + Math.cos(angle) * distance;
-        const endY = startY - Math.abs(Math.sin(angle) * distance) - 100; // Всегда вверх
+        // Получаем позицию пола
+        const floorY = window.innerHeight - 50; // 50px от нижнего края
+        
+        // Физические параметры
+        const gravity = 0.6; // пикселей в кадр
+        const initialVelocity = 12 + Math.random() * 8; // 12-20 пикселей в кадр
+        
+        // Угол вылета: ±45 градусов от вертикали
+        const angle = (Math.random() - 0.5) * Math.PI / 2; // от -45 до +45 градусов
+        let velocityX = Math.sin(angle) * initialVelocity;
+        let velocityY = -Math.cos(angle) * initialVelocity; // отрицательная - вверх
+        
+        // Начальная позиция
+        let x = startX;
+        let y = startY;
+        
+        // Случайная задержка для разных фаз анимации
+        const randomDelay = Math.random() * 0.3;
+        
+        // Случайная скорость вращения
+        const spinSpeed = 1.5 + Math.random() * 1;
+        let rotation = 0;
         
         coin.style.cssText = `
             position: fixed;
@@ -659,30 +676,71 @@ class GameUI {
             background-repeat: no-repeat;
             background-position: center;
             z-index: 35;
-            left: ${startX}px;
-            top: ${startY}px;
-            transform: translate(-50%, -50%);
+            left: ${x}px;
+            top: ${y}px;
+            transform: translate(-50%, -50%) rotate(0deg);
             image-rendering: pixelated;
             opacity: 1;
         `;
 
         document.body.appendChild(coin);
 
-        // Анимация полета монеты вверх
-        setTimeout(() => {
-            coin.style.transition = 'all 1s ease-out';
-            coin.style.left = `${endX}px`;
-            coin.style.top = `${endY}px`;
-            coin.style.opacity = '0';
-            coin.style.transform = 'translate(-50%, -50%) rotate(360deg)';
-        }, 50);
-
-        // Удаление монеты
-        setTimeout(() => {
-            if (coin.parentNode) {
-                coin.parentNode.removeChild(coin);
+        // Анимация с физикой
+        const animate = () => {
+            // Применяем гравитацию
+            velocityY += gravity;
+            
+            // Обновляем позицию
+            x += velocityX;
+            y += velocityY;
+            
+            // Вращение
+            rotation += 360 / (spinSpeed * 60); // 60 FPS
+            
+            // Проверяем столкновение с полом
+            if (y >= floorY - coinSize / 2) {
+                y = floorY - coinSize / 2;
+                velocityY = -velocityY * 0.7; // отскок с потерей энергии
+                
+                // Если скорость слишком мала, останавливаем
+                if (Math.abs(velocityY) < 1.5) {
+                    velocityY = 0;
+                }
             }
-        }, 1100);
+            
+            // Проверяем границы экрана по горизонтали
+            if (x < coinSize / 2) {
+                x = coinSize / 2;
+                velocityX = -velocityX * 0.8;
+            } else if (x > window.innerWidth - coinSize / 2) {
+                x = window.innerWidth - coinSize / 2;
+                velocityX = -velocityX * 0.8;
+            }
+            
+            // Обновляем позицию монеты
+            coin.style.left = `${x}px`;
+            coin.style.top = `${y}px`;
+            coin.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            
+            // Продолжаем анимацию если монета еще движется или время не истекло
+            if ((Math.abs(velocityY) > 0.5 || Math.abs(velocityX) > 0.5) && Date.now() - startTime < 5000) {
+                requestAnimationFrame(animate);
+            } else {
+                // Плавно исчезаем
+                coin.style.transition = 'opacity 0.5s ease-out';
+                coin.style.opacity = '0';
+                setTimeout(() => {
+                    if (coin.parentNode) {
+                        coin.parentNode.removeChild(coin);
+                    }
+                }, 500);
+            }
+        };
+        
+        const startTime = Date.now();
+        setTimeout(() => {
+            requestAnimationFrame(animate);
+        }, 50 + randomDelay * 1000);
     }
 
     /**
