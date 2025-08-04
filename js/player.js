@@ -180,24 +180,34 @@ class Player {
         // Анимация выстрела - летит к монстру
         const monsterElement = document.getElementById('monster');
         if (monsterElement) {
+            // Получаем позиции относительно game-objects
+            const gameObjects = document.getElementById('game-objects');
+            const gameObjectsRect = gameObjects.getBoundingClientRect();
             const monsterRect = monsterElement.getBoundingClientRect();
             const blastRect = blast.getBoundingClientRect();
             
-            // Вычисляем конечную позицию (центр монстра)
-            const endX = monsterRect.left + monsterRect.width / 2 - blastRect.left;
-            const endY = monsterRect.bottom - blastRect.bottom;
+            // Вычисляем позицию монстра относительно game-objects
+            const monsterX = monsterRect.left - gameObjectsRect.left + monsterRect.width / 2;
+            const monsterY = monsterRect.bottom - gameObjectsRect.bottom + monsterRect.height / 2;
             
-            // Убеждаемся, что blast летит к центру монстра
-            console.log('Blast летит от:', blastRect.left, blastRect.bottom, 'к:', monsterRect.left + monsterRect.width / 2, monsterRect.bottom);
+            // Вычисляем текущую позицию blast относительно game-objects
+            const blastX = blastRect.left - gameObjectsRect.left;
+            const blastY = blastRect.bottom - gameObjectsRect.bottom;
             
-            // Анимация полета blast к монстру (ускоренная)
-            blast.style.transition = 'all 0.2s ease-out';
+            // Вычисляем смещение для анимации
+            const endX = monsterX - blastX;
+            const endY = monsterY - blastY;
+            
+            console.log('Blast летит от:', blastX, blastY, 'к:', monsterX, monsterY);
+            
+            // Анимация полета blast к монстру (еще более замедленная)
+            blast.style.transition = 'all 0.8s ease-out';
             blast.style.transform = `translate(${endX}px, ${endY}px)`;
             
             // Смена спрайта blast на полпути
             setTimeout(() => {
                 blast.style.backgroundImage = "url('sprites/hero/blast2.png')";
-            }, 100);
+            }, 400);
             
             // Удаление blast и создание взрыва на монстре
             setTimeout(() => {
@@ -206,7 +216,7 @@ class Player {
                 }
                 // Создаем взрыв на позиции монстра
                 this.createBurstAtMonster();
-            }, 200);
+            }, 800);
         } else {
             // Если монстр не найден, просто удаляем blast
             setTimeout(() => {
@@ -234,9 +244,18 @@ class Player {
         const gameObjects = document.getElementById('game-objects');
         const gameObjectsRect = gameObjects.getBoundingClientRect();
         
-        // Позиция взрыва относительно game-objects (центр монстра)
-        const burstX = monsterRect.left - gameObjectsRect.left + monsterRect.width / 2 - burstSize / 2;
-        const burstY = monsterRect.bottom - gameObjectsRect.bottom + monsterRect.height / 2 - burstSize / 2;
+        // Позиция центра монстра относительно game-objects
+        const monsterCenterX = monsterRect.left - gameObjectsRect.left + monsterRect.width / 2;
+        const monsterCenterY = monsterRect.bottom - gameObjectsRect.bottom + monsterRect.height / 2;
+        
+        // Позиция взрыва (центр взрыва совпадает с центром монстра)
+        const burstX = monsterCenterX - burstSize / 2;
+        const burstY = monsterCenterY - burstSize / 2;
+        
+        console.log('Центр монстра:', monsterCenterX, monsterCenterY);
+        console.log('Позиция взрыва:', burstX, burstY);
+        
+        console.log('Взрыв создается на позиции монстра:', burstX, burstY, 'размер взрыва:', burstSize);
         
         console.log('Взрыв создается на позиции монстра:', burstX, burstY);
         

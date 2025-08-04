@@ -117,7 +117,7 @@ body {
 }
 
 #monster {
-    right: -100px;
+    left: 75%;
     bottom: 5%;
     z-index: 14;
 }

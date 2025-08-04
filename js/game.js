@@ -334,7 +334,7 @@ class GameEngine {
                 // Сохраняем прогресс только если очки не отрицательные
                 window.gameStorage.updateScore(points);
             }
-        }, 300); // Ждем завершения анимации атаки (200ms blast + 100ms burst)
+        }, 1200); // Ждем завершения анимации атаки (800ms blast + 400ms burst)
     }
 
     /**

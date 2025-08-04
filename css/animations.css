@@ -444,15 +444,15 @@
 /* Анимации для исчезновения монстра - адаптивные */
 @keyframes monster-disappear {
     0% { 
-        transform: translateX(0) scale(1);
+        transform: scale(1);
         opacity: 1;
     }
     50% { 
-        transform: translateX(-50%) scale(0.8);
+        transform: scale(0.8);
         opacity: 0.5;
     }
     100% { 
-        transform: translateX(-100%) scale(0.5);
+        transform: scale(0.5);
         opacity: 0;
     }
 }
