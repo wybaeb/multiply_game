@@ -307,7 +307,7 @@ body {
     bottom: clamp(200px, 25vh, 300px);
     right: clamp(10px, 2vw, 20px);
     pointer-events: auto;
-    width: 111px; /* 3 * 35px + 2 * 3px для средних экранов */
+    width: 100px; /* Уменьшено для точного выравнивания */
     padding: 0;
     margin: 0;
     overflow: hidden;
@@ -485,7 +485,7 @@ body {
     #input-container {
         bottom: 150px;
         right: 5px;
-        width: 96px; /* 3 * 30px + 2 * 3px */
+        width: 85px; /* Уменьшено для точного выравнивания */
     }
 }
 
@@ -518,7 +518,7 @@ body {
     #input-container {
         bottom: 300px;
         right: 20px;
-        width: 190px; /* 3 * 60px + 2 * 5px */
+        width: 175px; /* Уменьшено для точного выравнивания */
     }
 }
 
