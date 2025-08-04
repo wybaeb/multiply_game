@@ -2,6 +2,17 @@
  * Модуль для управления монстром - адаптивный
  */
 
+// Helper function to get correct sprite path
+function getSpritePath(path) {
+    // Check if we're running from a subdirectory (like js/)
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/js/') || currentPath.endsWith('/js')) {
+        return `../sprites/${path}`;
+    } else {
+        return `sprites/${path}`;
+    }
+}
+
 class Monster {
     constructor() {
         this.element = document.getElementById('monster');
@@ -213,7 +224,7 @@ class Monster {
 
         // Воспроизведение звука атаки
         try {
-            const attackSound = new Audio('sprites/music/attack.mp3');
+            const attackSound = new Audio(getSpritePath('music/attack.mp3'));
             attackSound.volume = 0.5; // Умеренная громкость
             attackSound.play().catch(e => console.log('Не удалось воспроизвести звук атаки:', e));
         } catch (e) {
@@ -250,7 +261,7 @@ class Monster {
             position: absolute;
             width: 80px;
             height: 80px;
-            background-image: url('sprites/monstr1/attack1.png');
+            background-image: url('${getSpritePath('monstr1/attack1.png')}');
             background-size: contain;
             background-repeat: no-repeat;
             image-rendering: pixelated;
@@ -599,17 +610,17 @@ class Monster {
         
         style.textContent = `
             @keyframes monster-walk-${this.monsterType} {
-                0% { background-image: url('sprites/${this.monsterType}/walk1.png'); }
-                33% { background-image: url('sprites/${this.monsterType}/walk2.png'); }
-                66% { background-image: url('sprites/${this.monsterType}/walk3.png'); }
-                100% { background-image: url('sprites/${this.monsterType}/walk1.png'); }
+                0% { background-image: url('${getSpritePath(this.monsterType + '/walk1.png')}'); }
+                33% { background-image: url('${getSpritePath(this.monsterType + '/walk2.png')}'); }
+                66% { background-image: url('${getSpritePath(this.monsterType + '/walk3.png')}'); }
+                100% { background-image: url('${getSpritePath(this.monsterType + '/walk1.png')}'); }
             }
             
             @keyframes monster-attack-${this.monsterType} {
-                0% { background-image: url('sprites/${this.monsterType}/attack1.png'); }
-                33% { background-image: url('sprites/${this.monsterType}/attack2.png'); }
-                66% { background-image: url('sprites/${this.monsterType}/attack3.png'); }
-                100% { background-image: url('sprites/${this.monsterType}/walk1.png'); }
+                0% { background-image: url('${getSpritePath(this.monsterType + '/attack1.png')}'); }
+                33% { background-image: url('${getSpritePath(this.monsterType + '/attack2.png')}'); }
+                66% { background-image: url('${getSpritePath(this.monsterType + '/attack3.png')}'); }
+                100% { background-image: url('${getSpritePath(this.monsterType + '/walk1.png')}'); }
             }
             
             .monster-walking-${this.monsterType} {

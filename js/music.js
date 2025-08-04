@@ -2,16 +2,27 @@
  * Модуль для управления музыкой в игре
  */
 
+// Helper function to get correct sprite path
+function getSpritePath(path) {
+    // Check if we're running from a subdirectory (like js/)
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/js/') || currentPath.endsWith('/js')) {
+        return `../sprites/${path}`;
+    } else {
+        return `sprites/${path}`;
+    }
+}
+
 class MusicManager {
     constructor() {
         this.currentTrack = null;
         this.isMusicEnabled = true;
         this.volume = 0.5;
         this.tracks = {
-            menu: 'sprites/music/bg1.mp3',
-            game: 'sprites/music/bg1.mp3',
-            monster: 'sprites/music/catch.mp3',
-            victory: 'sprites/music/win.mp3'
+            menu: getSpritePath('music/bg1.mp3'),
+            game: getSpritePath('music/bg1.mp3'),
+            monster: getSpritePath('music/catch.mp3'),
+            victory: getSpritePath('music/win.mp3')
         };
         this.audioElements = {};
         this.currentState = 'menu';

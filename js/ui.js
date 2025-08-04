@@ -1,6 +1,17 @@
 /**
- * Модуль для управления пользовательским интерфейсом - адаптивный
+ * Модуль для управления UI - адаптивный
  */
+
+// Helper function to get correct sprite path
+function getSpritePath(path) {
+    // Check if we're running from a subdirectory (like js/)
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/js/') || currentPath.endsWith('/js')) {
+        return `../sprites/${path}`;
+    } else {
+        return `sprites/${path}`;
+    }
+}
 
 class GameUI {
     constructor() {
@@ -559,7 +570,7 @@ class GameUI {
             position: fixed;
             width: ${coinSize}px;
             height: ${coinSize}px;
-            background-image: url('sprites/coin/${randomSprite}');
+            background-image: url('${getSpritePath('coin/' + randomSprite)}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -592,7 +603,7 @@ class GameUI {
         // Звуковой эффект для монеты (только для каждой пятой монеты)
         if (Math.random() < 0.2) { // 20% вероятность = 1/5 монет
             try {
-                const coinSound = new Audio('sprites/music/smrpg_coin.wav');
+                const coinSound = new Audio(getSpritePath('music/smrpg_coin.wav'));
                 coinSound.volume = 0.4; // Умеренная громкость
                 coinSound.play().catch(e => console.log('Не удалось воспроизвести звук монеты:', e));
             } catch (e) {
@@ -735,7 +746,7 @@ class GameUI {
             position: fixed;
             width: ${coinSize}px;
             height: ${coinSize}px;
-            background-image: url('sprites/coin/${randomSprite}');
+            background-image: url('${getSpritePath('coin/' + randomSprite)}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;

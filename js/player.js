@@ -2,6 +2,17 @@
  * Модуль для управления персонажем - адаптивный
  */
 
+// Helper function to get correct sprite path
+function getSpritePath(path) {
+    // Check if we're running from a subdirectory (like js/)
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/js/') || currentPath.endsWith('/js')) {
+        return `../sprites/${path}`;
+    } else {
+        return `sprites/${path}`;
+    }
+}
+
 class Player {
     constructor() {
         this.element = document.getElementById('player');
@@ -165,7 +176,7 @@ class Player {
             position: absolute;
             width: ${blastSize}px;
             height: ${blastSize}px;
-            background-image: url('sprites/hero/blast1.png');
+            background-image: url('${getSpritePath('hero/blast1.png')}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -207,7 +218,7 @@ class Player {
             
             // Смена спрайта blast на полпути
             setTimeout(() => {
-                blast.style.backgroundImage = "url('sprites/hero/blast2.png')";
+                blast.style.backgroundImage = `url('${getSpritePath('hero/blast2.png')}')`;
             }, 400);
             
             // Удаление blast и создание взрыва на монстре
@@ -271,7 +282,7 @@ class Player {
             position: absolute;
             width: ${burstSize}px;
             height: ${burstSize}px;
-            background-image: url('sprites/hero/burst.png');
+            background-image: url('${getSpritePath('hero/burst.png')}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -305,7 +316,7 @@ class Player {
             position: absolute;
             width: ${burstSize}px;
             height: ${burstSize}px;
-            background-image: url('sprites/hero/burst.png');
+            background-image: url('${getSpritePath('hero/burst.png')}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
