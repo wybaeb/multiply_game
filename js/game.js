@@ -403,28 +403,32 @@ class GameEngine {
         // Запускаем спавн следующего монстра
         this.startMonsterSpawn();
 
-        // Проверяем завершение уровня
-        this.checkLevelCompletion();
+        // Проверяем переход к следующей группе сумм
+        this.checkSumGroupTransition();
     }
 
     /**
-     * Проверка завершения уровня
+     * Проверка перехода к следующей группе сумм
      */
-    checkLevelCompletion() {
-        // Здесь можно добавить логику проверки завершения уровня
-        // Например, после определенного количества побед
-        const nextLevel = window.mathGame.getNextLevel();
-        if (nextLevel) {
-            // Переход на следующий уровень
-            this.currentLevel = nextLevel;
-            window.mathGame.setLevel(nextLevel);
-            window.gameStorage.updateLevel(nextLevel);
+    checkSumGroupTransition() {
+        // Проверяем, завершена ли текущая группа сумм
+        if (window.mathGame.isCurrentSumGroupCompleted()) {
+            const currentSumGroup = window.mathGame.getCurrentSumGroup();
+            const nextSumGroup = currentSumGroup + 1;
+            
+            // Если достигли максимума, начинаем заново
+            if (nextSumGroup > 18) {
+                window.mathGame.setLevel(3); // Начинаем заново с суммы 3
+                window.gameUI.showMessage('Новый цикл! Начинаем заново!', 'info');
+            } else {
+                // Переходим к следующей группе сумм
+                window.mathGame.setLevel(nextSumGroup);
+                window.gameUI.showMessage(`Новая группа: сумма ${nextSumGroup}!`, 'info');
+            }
             
             // Обновляем сложность монстра
             const difficulty = window.mathGame.getLevelDifficulty();
             window.monster.setDifficulty(difficulty);
-
-            window.gameUI.showMessage(`Уровень ${nextLevel}!`, 'info');
         }
     }
 
@@ -472,6 +476,7 @@ class GameEngine {
         this.currentLevel = 1;
         this.currentScore = 0;
         window.mathGame.setLevel(1);
+        window.mathGame.resetProgress();
         window.gameUI.updateMenuStats();
     }
 
@@ -501,6 +506,27 @@ class GameEngine {
             }
             window.gameUI.showMessage('Игра возобновлена', 'info');
         }
+    }
+
+    /**
+     * Получение статистики прогресса
+     */
+    getProgressStats() {
+        return window.mathGame.getProgressStats();
+    }
+
+    /**
+     * Получение информации о текущей группе сумм
+     */
+    getCurrentSumGroupInfo() {
+        return window.mathGame.getCurrentSumGroupInfo();
+    }
+
+    /**
+     * Получение статистики по всем группам сумм
+     */
+    getSumGroupsStats() {
+        return window.mathGame.getSumGroupsStats();
     }
 }
 

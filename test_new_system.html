@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест новой системы уровней</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 3px;
+        }
+        .problem {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тест новой системы уровней</h1>
+    
+    <div class="test-section">
+        <h2>Тест генерации примеров</h2>
+        <button onclick="testGenerateProblems()">Генерировать примеры</button>
+        <div id="problems-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Тест групп сумм</h2>
+        <button onclick="testSumGroups()">Показать группы сумм</button>
+        <div id="sum-groups-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Тест прогресса</h2>
+        <button onclick="testProgress()">Показать прогресс</button>
+        <div id="progress-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Тест проверки ответов</h2>
+        <div id="current-problem" class="problem"></div>
+        <input type="number" id="answer-input" placeholder="Введите ответ">
+        <button onclick="testCheckAnswer()">Проверить ответ</button>
+        <div id="answer-result" class="result"></div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/math.js"></script>
+    
+    <script>
+        let currentTestProblem = null;
+        
+        function testGenerateProblems() {
+            const result = document.getElementById('problems-result');
+            let html = '<h3>Примеры по группам сумм:</h3>';
+            
+            for (let sum = 3; sum <= 10; sum++) {
+                const problems = window.mathGame.generateSumGroupProblems(sum);
+                html += `<p><strong>Сумма ${sum}:</strong> ${problems.map(p => `${p.a} × ${p.b}`).join(', ')}</p>`;
+            }
+            
+            result.innerHTML = html;
+        }
+        
+        function testSumGroups() {
+            const result = document.getElementById('sum-groups-result');
+            let html = '<h3>Статистика по группам сумм:</h3>';
+            
+            const stats = window.mathGame.getSumGroupsStats();
+            for (let sum = 3; sum <= 10; sum++) {
+                if (stats[sum]) {
+                    html += `<p><strong>Сумма ${sum}:</strong> ${stats[sum].totalProblems} примеров, сложность: ${stats[sum].difficulty}</p>`;
+                }
+            }
+            
+            result.innerHTML = html;
+        }
+        
+        function testProgress() {
+            const result = document.getElementById('progress-result');
+            const progress = window.mathGame.getProgressStats();
+            const sumGroupInfo = window.mathGame.getCurrentSumGroupInfo();
+            
+            let html = '<h3>Прогресс:</h3>';
+            html += `<p>Общий прогресс: ${progress.progressPercentage}%</p>`;
+            html += `<p>Решено примеров: ${progress.solvedProblems}/${progress.totalProblems}</p>`;
+            html += `<p>Текущая группа: сумма ${sumGroupInfo.sum}</p>`;
+            html += `<p>Прогресс группы: ${sumGroupInfo.currentIndex + 1}/${sumGroupInfo.totalProblems}</p>`;
+            
+            result.innerHTML = html;
+        }
+        
+        function testCheckAnswer() {
+            const input = document.getElementById('answer-input');
+            const result = document.getElementById('answer-result');
+            
+            if (!currentTestProblem) {
+                currentTestProblem = window.mathGame.generateProblem();
+                document.getElementById('current-problem').textContent = 
+                    window.mathGame.getProblemText();
+            }
+            
+            const userAnswer = parseInt(input.value);
+            const checkResult = window.mathGame.checkAnswer(userAnswer);
+            
+            let html = `<p><strong>Результат:</strong> ${checkResult.message}</p>`;
+            html += `<p>Очки: ${checkResult.points}</p>`;
+            html += `<p>Группа сумм: ${checkResult.sumGroup}</p>`;
+            
+            result.innerHTML = html;
+            input.value = '';
+            
+            // Генерируем новый пример
+            currentTestProblem = window.mathGame.generateProblem();
+            document.getElementById('current-problem').textContent = 
+                window.mathGame.getProblemText();
+        }
+        
+        // Инициализация при загрузке
+        window.addEventListener('load', () => {
+            window.mathGame.setLevel(3);
+            currentTestProblem = window.mathGame.generateProblem();
+            document.getElementById('current-problem').textContent = 
+                window.mathGame.getProblemText();
+        });
+    </script>
+</body>
+</html> 

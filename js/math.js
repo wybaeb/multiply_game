@@ -1,125 +1,71 @@
 /**
  * Модуль для работы с математическими задачами
+ * Новая система: генерация по принципу суммы цифр с псевдослучайностью
  */
 
 class MathGame {
     constructor() {
         this.currentLevel = 1;
-        this.levelConfigs = this.initializeLevelConfigs();
+        this.currentScore = 0;
         this.currentProblem = null;
+        this.problemHistory = new Set(); // Для отслеживания уже решенных примеров
+        this.currentSumGroup = 3; // Начинаем с суммы 3
+        this.sumGroupProblems = []; // Проблемы текущей группы сумм
+        this.sumGroupIndex = 0; // Индекс в текущей группе
+        this.seed = Date.now(); // Семя для псевдослучайности
+        this.maxSum = 18; // Максимальная сумма для таблицы умножения (9+9)
     }
 
     /**
-     * Инициализация конфигураций уровней
+     * Простой генератор псевдослучайных чисел
      */
-    initializeLevelConfigs() {
-        return {
-            1: {
-                name: "Уровень 1",
-                description: "Умножение на 1 и 2",
-                problems: [
-                    { a: 1, b: 2 },
-                    { a: 2, b: 1 }
-                ],
-                difficulty: "easy"
-            },
-            2: {
-                name: "Уровень 2",
-                description: "Умножение на 1, 2 и 3",
-                problems: [
-                    { a: 2, b: 3 },
-                    { a: 3, b: 2 },
-                    { a: 1, b: 3 },
-                    { a: 3, b: 1 }
-                ],
-                difficulty: "easy"
-            },
-            3: {
-                name: "Уровень 3",
-                description: "Умножение на 2, 3 и 4",
-                problems: [
-                    { a: 2, b: 4 },
-                    { a: 4, b: 2 },
-                    { a: 3, b: 4 },
-                    { a: 4, b: 3 }
-                ],
-                difficulty: "medium"
-            },
-            4: {
-                name: "Уровень 4",
-                description: "Умножение на 3, 4 и 5",
-                problems: [
-                    { a: 3, b: 5 },
-                    { a: 5, b: 3 },
-                    { a: 4, b: 5 },
-                    { a: 5, b: 4 }
-                ],
-                difficulty: "medium"
-            },
-            5: {
-                name: "Уровень 5",
-                description: "Умножение на 4, 5 и 6",
-                problems: [
-                    { a: 4, b: 6 },
-                    { a: 6, b: 4 },
-                    { a: 5, b: 6 },
-                    { a: 6, b: 5 }
-                ],
-                difficulty: "medium"
-            },
-            6: {
-                name: "Уровень 6",
-                description: "Умножение на 5, 6 и 7",
-                problems: [
-                    { a: 5, b: 7 },
-                    { a: 7, b: 5 },
-                    { a: 6, b: 7 },
-                    { a: 7, b: 6 }
-                ],
-                difficulty: "hard"
-            },
-            7: {
-                name: "Уровень 7",
-                description: "Умножение на 6, 7 и 8",
-                problems: [
-                    { a: 6, b: 8 },
-                    { a: 8, b: 6 },
-                    { a: 7, b: 8 },
-                    { a: 8, b: 7 }
-                ],
-                difficulty: "hard"
-            },
-            8: {
-                name: "Уровень 8",
-                description: "Умножение на 7, 8 и 9",
-                problems: [
-                    { a: 7, b: 9 },
-                    { a: 9, b: 7 },
-                    { a: 8, b: 9 },
-                    { a: 9, b: 8 }
-                ],
-                difficulty: "very_hard"
-            },
-            9: {
-                name: "Уровень 9",
-                description: "Финальный уровень - 9 на 9",
-                problems: [
-                    { a: 9, b: 9 }
-                ],
-                difficulty: "expert"
-            }
-        };
+    pseudoRandom() {
+        this.seed = (this.seed * 9301 + 49297) % 233280;
+        return this.seed / 233280;
     }
 
     /**
-     * Установка текущего уровня
+     * Генерация всех примеров для заданной суммы цифр
+     */
+    generateSumGroupProblems(sum) {
+        const problems = [];
+        
+        // Генерируем все возможные пары (a, b) где a + b = sum
+        for (let a = 1; a <= Math.min(sum - 1, 9); a++) {
+            const b = sum - a;
+            if (b >= 1 && b <= 9) {
+                problems.push({ a, b });
+            }
+        }
+        
+        return problems;
+    }
+
+    /**
+     * Перемешивание массива с псевдослучайностью
+     */
+    shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(this.pseudoRandom() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    /**
+     * Установка текущего уровня (теперь это сумма цифр)
      */
     setLevel(level) {
-        if (this.levelConfigs[level]) {
-            this.currentLevel = level;
-            return true;
-        }
-        return false;
+        this.currentLevel = level;
+        this.currentSumGroup = Math.max(3, level); // Минимум сумма 3
+        
+        // Генерируем проблемы для текущей группы сумм
+        this.sumGroupProblems = this.generateSumGroupProblems(this.currentSumGroup);
+        this.sumGroupProblems = this.shuffleArray(this.sumGroupProblems);
+        this.sumGroupIndex = 0;
+        
+        return true;
     }
 
     /**
@@ -130,34 +76,57 @@ class MathGame {
     }
 
     /**
-     * Получение конфигурации уровня
+     * Получение текущей группы сумм
      */
-    getLevelConfig(level = this.currentLevel) {
-        return this.levelConfigs[level] || null;
+    getCurrentSumGroup() {
+        return this.currentSumGroup;
     }
 
     /**
-     * Генерация случайной задачи для текущего уровня
+     * Генерация следующей задачи
      */
-    generateProblem(level = this.currentLevel) {
-        const config = this.getLevelConfig(level);
-        if (!config) {
-            throw new Error(`Уровень ${level} не найден`);
+    generateProblem() {
+        // Если прошли все проблемы в текущей группе, переходим к следующей
+        if (this.sumGroupIndex >= this.sumGroupProblems.length) {
+            this.currentSumGroup++;
+            
+            // Если достигли максимума, начинаем заново с 3
+            if (this.currentSumGroup > this.maxSum) {
+                this.currentSumGroup = 3;
+                this.problemHistory.clear(); // Очищаем историю для нового цикла
+            }
+            
+            this.sumGroupProblems = this.generateSumGroupProblems(this.currentSumGroup);
+            this.sumGroupProblems = this.shuffleArray(this.sumGroupProblems);
+            this.sumGroupIndex = 0;
         }
 
-        // Выбираем случайную задачу из уровня
-        const randomIndex = Math.floor(Math.random() * config.problems.length);
-        const problem = config.problems[randomIndex];
-
+        // Выбираем следующую проблему из текущей группы
+        const problem = this.sumGroupProblems[this.sumGroupIndex];
+        
         this.currentProblem = {
             a: problem.a,
             b: problem.b,
             answer: problem.a * problem.b,
-            level: level,
-            difficulty: config.difficulty
+            level: this.currentLevel,
+            sumGroup: this.currentSumGroup,
+            problemId: `${problem.a}x${problem.b}`,
+            difficulty: this.getDifficultyForSum(this.currentSumGroup)
         };
 
+        this.sumGroupIndex++;
         return this.currentProblem;
+    }
+
+    /**
+     * Определение сложности на основе суммы цифр
+     */
+    getDifficultyForSum(sum) {
+        if (sum <= 5) return 'easy';
+        if (sum <= 8) return 'medium';
+        if (sum <= 12) return 'hard';
+        if (sum <= 15) return 'very_hard';
+        return 'expert';
     }
 
     /**
@@ -186,18 +155,23 @@ class MathGame {
         }
 
         if (userNum === correctAnswer) {
+            // Добавляем в историю решенных
+            this.problemHistory.add(this.currentProblem.problemId);
+            
             return { 
                 correct: true, 
                 message: "Правильно!", 
                 answer: correctAnswer,
-                points: this.calculatePoints()
+                points: this.calculatePoints(),
+                sumGroup: this.currentSumGroup
             };
         } else {
             return { 
                 correct: false, 
                 message: `Неправильно. Правильный ответ: ${correctAnswer}`, 
                 answer: correctAnswer,
-                points: -50
+                points: -50,
+                sumGroup: this.currentSumGroup
             };
         }
     }
@@ -208,95 +182,86 @@ class MathGame {
     calculatePoints(timeRemaining = 60) {
         const basePoints = 10;
         const timeBonus = Math.floor(timeRemaining * 0.5);
-        return basePoints + timeBonus;
+        const difficultyBonus = this.getDifficultyBonus();
+        return basePoints + timeBonus + difficultyBonus;
     }
 
     /**
-     * Получение всех задач для уровня
+     * Бонус за сложность
      */
-    getAllProblemsForLevel(level = this.currentLevel) {
-        const config = this.getLevelConfig(level);
-        if (!config) {
-            return [];
+    getDifficultyBonus() {
+        const difficulty = this.currentProblem.difficulty;
+        switch (difficulty) {
+            case 'easy': return 0;
+            case 'medium': return 5;
+            case 'hard': return 10;
+            case 'very_hard': return 15;
+            case 'expert': return 20;
+            default: return 0;
         }
-
-        return config.problems.map(problem => ({
-            a: problem.a,
-            b: problem.b,
-            answer: problem.a * problem.b,
-            text: `${problem.a} × ${problem.b} = ${problem.a * problem.b}`
-        }));
     }
 
     /**
-     * Проверка завершения уровня
+     * Получение статистики прогресса
      */
-    isLevelCompleted(level = this.currentLevel) {
-        const config = this.getLevelConfig(level);
-        if (!config) {
-            return false;
-        }
-
-        // Уровень считается завершенным, если решено минимум 3 задачи
-        return config.problems.length >= 3;
+    getProgressStats() {
+        const totalProblems = this.getTotalProblemsCount();
+        const solvedProblems = this.problemHistory.size;
+        const currentSumProgress = this.sumGroupIndex;
+        const totalSumProgress = this.sumGroupProblems.length;
+        
+        return {
+            totalProblems,
+            solvedProblems,
+            progressPercentage: Math.round((solvedProblems / totalProblems) * 100),
+            currentSumGroup: this.currentSumGroup,
+            currentSumProgress,
+            totalSumProgress,
+            sumProgressPercentage: Math.round((currentSumProgress / totalSumProgress) * 100)
+        };
     }
 
     /**
-     * Получение следующего уровня
+     * Подсчет общего количества примеров в таблице умножения
+     */
+    getTotalProblemsCount() {
+        let count = 0;
+        for (let sum = 3; sum <= this.maxSum; sum++) {
+            count += this.generateSumGroupProblems(sum).length;
+        }
+        return count;
+    }
+
+    /**
+     * Получение информации о текущей группе сумм
+     */
+    getCurrentSumGroupInfo() {
+        const problems = this.generateSumGroupProblems(this.currentSumGroup);
+        return {
+            sum: this.currentSumGroup,
+            totalProblems: problems.length,
+            currentIndex: this.sumGroupIndex,
+            problems: problems.map(p => `${p.a} × ${p.b}`),
+            difficulty: this.getDifficultyForSum(this.currentSumGroup)
+        };
+    }
+
+    /**
+     * Получение следующего уровня (следующая группа сумм)
      */
     getNextLevel() {
-        const nextLevel = this.currentLevel + 1;
-        return this.levelConfigs[nextLevel] ? nextLevel : null;
+        const nextSum = this.currentSumGroup + 1;
+        if (nextSum <= this.maxSum) {
+            return nextSum;
+        }
+        return null; // Достигнут максимум
     }
 
     /**
-     * Получение статистики по уровням
+     * Проверка завершения текущей группы сумм
      */
-    getLevelStats() {
-        const stats = {};
-        
-        for (let level = 1; level <= 9; level++) {
-            const config = this.getLevelConfig(level);
-            if (config) {
-                stats[level] = {
-                    name: config.name,
-                    description: config.description,
-                    difficulty: config.difficulty,
-                    problemCount: config.problems.length,
-                    problems: config.problems
-                };
-            }
-        }
-
-        return stats;
-    }
-
-    /**
-     * Генерация тренировочной задачи
-     */
-    generateTrainingProblem(minLevel = 1, maxLevel = 9) {
-        const availableLevels = [];
-        
-        for (let level = minLevel; level <= maxLevel; level++) {
-            if (this.levelConfigs[level]) {
-                availableLevels.push(level);
-            }
-        }
-
-        if (availableLevels.length === 0) {
-            throw new Error("Нет доступных уровней");
-        }
-
-        const randomLevel = availableLevels[Math.floor(Math.random() * availableLevels.length)];
-        return this.generateProblem(randomLevel);
-    }
-
-    /**
-     * Проверка сложности уровня
-     */
-    getLevelDifficulty(level = this.currentLevel) {
-        const config = this.getLevelConfig(level);
-        return config ? config.difficulty : 'unknown';
+    isCurrentSumGroupCompleted() {
+        return this.sumGroupIndex >= this.sumGroupProblems.length;
     }
 
     /**
@@ -307,7 +272,7 @@ class MathGame {
             return "Сначала сгенерируйте задачу";
         }
 
-        const { a, b } = this.currentProblem;
+        const { a, b, sumGroup } = this.currentProblem;
         
         // Различные типы подсказок в зависимости от сложности
         switch (this.currentProblem.difficulty) {
@@ -320,31 +285,34 @@ class MathGame {
             case 'very_hard':
                 return `Используйте таблицу умножения`;
             case 'expert':
-                return `9 × 9 = 81 - это нужно запомнить!`;
+                return `Сложные примеры требуют хорошего знания таблицы!`;
             default:
                 return "Попробуйте еще раз";
         }
     }
 
     /**
-     * Получение прогресса по уровням
+     * Получение статистики по группам сумм
      */
-    getProgress() {
-        const progress = {};
+    getSumGroupsStats() {
+        const stats = {};
         
-        for (let level = 1; level <= 9; level++) {
-            const config = this.getLevelConfig(level);
-            if (config) {
-                progress[level] = {
-                    name: config.name,
-                    difficulty: config.difficulty,
-                    problemCount: config.problems.length,
-                    completed: false // Будет заполняться из хранилища
-                };
-            }
+        for (let sum = 3; sum <= this.maxSum; sum++) {
+            const problems = this.generateSumGroupProblems(sum);
+            const solvedInGroup = problems.filter(p => 
+                this.problemHistory.has(`${p.a}x${p.b}`)
+            ).length;
+            
+            stats[sum] = {
+                totalProblems: problems.length,
+                solvedProblems: solvedInGroup,
+                progressPercentage: Math.round((solvedInGroup / problems.length) * 100),
+                difficulty: this.getDifficultyForSum(sum),
+                examples: problems.map(p => `${p.a} × ${p.b}`)
+            };
         }
 
-        return progress;
+        return stats;
     }
 
     /**
@@ -369,6 +337,24 @@ class MathGame {
      */
     formatInput(input) {
         return input.replace(/[^0-9]/g, '');
+    }
+
+    /**
+     * Сброс прогресса
+     */
+    resetProgress() {
+        this.problemHistory.clear();
+        this.currentSumGroup = 3;
+        this.sumGroupIndex = 0;
+        this.sumGroupProblems = this.generateSumGroupProblems(this.currentSumGroup);
+        this.sumGroupProblems = this.shuffleArray(this.sumGroupProblems);
+    }
+
+    /**
+     * Получение информации о сложности уровня
+     */
+    getLevelDifficulty() {
+        return this.getDifficultyForSum(this.currentSumGroup);
     }
 }
 

@@ -163,6 +163,21 @@ class GameUI {
             }
         });
 
+        // Обработчики новых кнопок статистики
+        const showStatsBtn = document.getElementById('show-stats-btn');
+        if (showStatsBtn) {
+            showStatsBtn.addEventListener('click', () => {
+                this.showSumGroupsStats();
+            });
+        }
+
+        const showProgressBtn = document.getElementById('show-progress-btn');
+        if (showProgressBtn) {
+            showProgressBtn.addEventListener('click', () => {
+                this.showProgressStats();
+            });
+        }
+
         // Обработка клавиатуры
         document.addEventListener('keydown', (e) => {
             this.handleKeyboardInput(e);
@@ -269,7 +284,9 @@ class GameUI {
         if (window.gameStorage) {
             const gameData = window.gameStorage.loadGameData();
             if (this.elements.currentLevel) {
-                this.elements.currentLevel.textContent = gameData.currentLevel;
+                // Показываем текущую группу сумм вместо уровня
+                const currentSumGroup = window.mathGame ? window.mathGame.getCurrentSumGroup() : 3;
+                this.elements.currentLevel.textContent = `Сумма ${currentSumGroup}`;
             }
             if (this.elements.totalScore) {
                 this.elements.totalScore.textContent = gameData.totalScore;
@@ -713,11 +730,79 @@ class GameUI {
                     
                     // Убеждаемся, что поле ввода имеет тень
                     if (this.elements.answerInput) {
-                        this.elements.answerInput.style.boxShadow = '3px 3px 0 #000';
+                        this.elements.answerInput.style.boxShadow = '3px 3px 0 #000 !important';
+                        this.elements.inputContainer.style.boxShadow = '3px 3px 0 #000 !important';
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Показ информации о текущей группе сумм
+     */
+    showSumGroupInfo() {
+        if (!window.mathGame) return;
+
+        const sumGroupInfo = window.mathGame.getCurrentSumGroupInfo();
+        const progressStats = window.mathGame.getProgressStats();
+        
+        // Создаем информационное сообщение
+        const message = `Группа: сумма ${sumGroupInfo.sum} (${sumGroupInfo.currentIndex + 1}/${sumGroupInfo.totalProblems})
+Прогресс: ${progressStats.solvedProblems}/${progressStats.totalProblems} примеров (${progressStats.progressPercentage}%)
+Сложность: ${this.getDifficultyText(sumGroupInfo.difficulty)}`;
+        
+        this.showMessage(message, 'info');
+    }
+
+    /**
+     * Получение текста сложности
+     */
+    getDifficultyText(difficulty) {
+        const difficultyTexts = {
+            'easy': 'Легкая',
+            'medium': 'Средняя',
+            'hard': 'Сложная',
+            'very_hard': 'Очень сложная',
+            'expert': 'Эксперт'
+        };
+        return difficultyTexts[difficulty] || 'Неизвестно';
+    }
+
+    /**
+     * Показ статистики прогресса
+     */
+    showProgressStats() {
+        if (!window.mathGame) return;
+
+        const stats = window.mathGame.getProgressStats();
+        const sumGroupInfo = window.mathGame.getCurrentSumGroupInfo();
+        
+        const message = `Общий прогресс: ${stats.progressPercentage}%
+Решено примеров: ${stats.solvedProblems}/${stats.totalProblems}
+Текущая группа: сумма ${sumGroupInfo.sum} (${sumGroupInfo.currentIndex + 1}/${sumGroupInfo.totalProblems})
+Прогресс группы: ${sumGroupInfo.currentIndex + 1}/${sumGroupInfo.totalProblems}`;
+        
+        this.showMessage(message, 'info');
+    }
+
+    /**
+     * Показ статистики по всем группам сумм
+     */
+    showSumGroupsStats() {
+        if (!window.mathGame) return;
+
+        const stats = window.mathGame.getSumGroupsStats();
+        let message = 'Статистика по группам сумм:\n';
+        
+        // Показываем только группы с прогрессом
+        for (let sum = 3; sum <= 18; sum++) {
+            if (stats[sum] && stats[sum].solvedProblems > 0) {
+                message += `Сумма ${sum}: ${stats[sum].solvedProblems}/${stats[sum].totalProblems} (${stats[sum].progressPercentage}%)\n`;
+            }
+        }
+        
+        this.showMessage(message, 'info');
     }
 }
 

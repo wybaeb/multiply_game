@@ -60,21 +60,12 @@ class GameStorage {
      */
     getDefaultData() {
         return {
-            currentLevel: 1,
+            currentLevel: 3, // Начинаем с суммы 3
             totalScore: 0,
             currentScore: 0,
             completedLevels: [],
-            gameProgress: {
-                level1: { completed: false, bestScore: 0 },
-                level2: { completed: false, bestScore: 0 },
-                level3: { completed: false, bestScore: 0 },
-                level4: { completed: false, bestScore: 0 },
-                level5: { completed: false, bestScore: 0 },
-                level6: { completed: false, bestScore: 0 },
-                level7: { completed: false, bestScore: 0 },
-                level8: { completed: false, bestScore: 0 },
-                level9: { completed: false, bestScore: 0 }
-            },
+            sumGroupsProgress: {}, // Прогресс по группам сумм
+            solvedProblems: [], // Список решенных примеров
             settings: {
                 soundEnabled: true,
                 musicEnabled: true,
@@ -125,25 +116,51 @@ class GameStorage {
     }
 
     /**
-     * Отметка завершения уровня
+     * Сохранение решенного примера
      */
-    completeLevel(level, score) {
+    saveSolvedProblem(problemId, sumGroup) {
         const data = this.loadGameData();
         
-        if (!data.completedLevels.includes(level)) {
-            data.completedLevels.push(level);
+        // Добавляем в список решенных примеров
+        if (!data.solvedProblems.includes(problemId)) {
+            data.solvedProblems.push(problemId);
         }
         
-        const levelKey = `level${level}`;
-        if (data.gameProgress[levelKey]) {
-            data.gameProgress[levelKey].completed = true;
-            if (score > data.gameProgress[levelKey].bestScore) {
-                data.gameProgress[levelKey].bestScore = score;
-            }
+        // Обновляем прогресс по группе сумм
+        if (!data.sumGroupsProgress[sumGroup]) {
+            data.sumGroupsProgress[sumGroup] = {
+                solvedProblems: [],
+                totalProblems: 0,
+                completed: false
+            };
+        }
+        
+        if (!data.sumGroupsProgress[sumGroup].solvedProblems.includes(problemId)) {
+            data.sumGroupsProgress[sumGroup].solvedProblems.push(problemId);
         }
         
         data.lastPlayed = new Date().toISOString();
         return this.saveGameData(data);
+    }
+
+    /**
+     * Получение прогресса по группе сумм
+     */
+    getSumGroupProgress(sumGroup) {
+        const data = this.loadGameData();
+        return data.sumGroupsProgress[sumGroup] || {
+            solvedProblems: [],
+            totalProblems: 0,
+            completed: false
+        };
+    }
+
+    /**
+     * Получение всех решенных примеров
+     */
+    getSolvedProblems() {
+        const data = this.loadGameData();
+        return data.solvedProblems || [];
     }
 
     /**
@@ -153,10 +170,10 @@ class GameStorage {
         const data = this.loadGameData();
         return {
             totalScore: data.totalScore,
-            completedLevels: data.completedLevels.length,
+            solvedProblemsCount: data.solvedProblems ? data.solvedProblems.length : 0,
             currentLevel: data.currentLevel,
             lastPlayed: data.lastPlayed,
-            gameProgress: data.gameProgress
+            sumGroupsProgress: data.sumGroupsProgress || {}
         };
     }
 
