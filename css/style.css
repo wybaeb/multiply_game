@@ -400,6 +400,20 @@ body {
     padding: clamp(20px, 4vw, 40px);
 }
 
+.quant-academy-badge {
+    margin-bottom: clamp(15px, 3vh, 25px);
+    text-align: center;
+}
+
+.quant-academy-badge img {
+    width: clamp(240px, 45vw, 360px);
+    height: auto;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(2px 2px 0 #000);
+}
+
 .menu-content h1 {
     font-family: 'Press Start 2P', cursive;
     font-size: clamp(20px, 4vw, 36px);

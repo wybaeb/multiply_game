@@ -59,6 +59,7 @@ class GameUI {
             totalScore: document.getElementById('total-score'),
             startGameBtn: document.getElementById('start-game-btn'),
             resetProgressBtn: document.getElementById('reset-progress-btn'),
+            musicToggleBtn: document.getElementById('music-toggle-btn'),
             
             // Эффекты
             effectsContainer: document.getElementById('effects-container')
@@ -170,6 +171,17 @@ class GameUI {
                 }
             }
         });
+
+        // Кнопка управления музыкой
+        const musicToggleBtn = document.getElementById('music-toggle-btn');
+        if (musicToggleBtn) {
+            musicToggleBtn.addEventListener('click', () => {
+                if (window.musicManager) {
+                    const isMusicOn = window.musicManager.toggleMusic();
+                    musicToggleBtn.textContent = isMusicOn ? '🔊 Музыка' : '🔇 Музыка';
+                }
+            });
+        }
 
         // Обработчики новых кнопок статистики
         const showStatsBtn = document.getElementById('show-stats-btn');
@@ -307,6 +319,12 @@ class GameUI {
                 } else {
                     this.elements.startGameBtn.textContent = 'Начать игру';
                 }
+            }
+            
+            // Обновляем состояние кнопки музыки
+            if (this.elements.musicToggleBtn && window.musicManager) {
+                const isMusicOn = window.musicManager.isMusicOn();
+                this.elements.musicToggleBtn.textContent = isMusicOn ? '🔊 Музыка' : '🔇 Музыка';
             }
         }
     }

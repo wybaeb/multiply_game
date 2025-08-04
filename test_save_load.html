@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест сохранения/загрузки</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тест сохранения и загрузки данных игры</h1>
+    
+    <div class="test-container">
+        <h2>Текущие данные</h2>
+        <div id="current-data" class="result">
+            Загрузка...
+        </div>
+        <button onclick="loadData()">Загрузить данные</button>
+        <button onclick="saveTestData()">Сохранить тестовые данные</button>
+        <button onclick="resetData()">Сбросить данные</button>
+    </div>
+    
+    <div class="test-container">
+        <h2>Тест кнопки меню</h2>
+        <button onclick="testMenuButton()">Проверить текст кнопки</button>
+        <div id="menu-test" class="result">
+            Результат теста появится здесь
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script>
+        function loadData() {
+            const data = window.gameStorage.loadGameData();
+            document.getElementById('current-data').innerHTML = `
+                <strong>Текущие данные:</strong><br>
+                Уровень: ${data.currentLevel}<br>
+                Очки: ${data.totalScore}<br>
+                Последняя игра: ${data.lastPlayed}<br>
+                Решенные примеры: ${data.solvedProblems ? data.solvedProblems.length : 0}
+            `;
+        }
+
+        function saveTestData() {
+            const testData = {
+                currentLevel: 5, // Группа сумма 5
+                totalScore: 1500,
+                currentScore: 1500,
+                completedLevels: [],
+                sumGroupsProgress: {},
+                solvedProblems: ['5x1', '5x2', '5x3'],
+                settings: {
+                    soundEnabled: true,
+                    musicEnabled: true,
+                    difficulty: 'normal'
+                },
+                lastPlayed: new Date().toISOString()
+            };
+            
+            window.gameStorage.saveGameData(testData);
+            loadData();
+            alert('Тестовые данные сохранены!');
+        }
+
+        function resetData() {
+            window.gameStorage.resetProgress();
+            loadData();
+            alert('Данные сброшены!');
+        }
+
+        function testMenuButton() {
+            const data = window.gameStorage.loadGameData();
+            const buttonText = data.totalScore > 0 ? 'Продолжить игру' : 'Начать игру';
+            document.getElementById('menu-test').innerHTML = `
+                <strong>Текущие очки:</strong> ${data.totalScore}<br>
+                <strong>Текст кнопки должен быть:</strong> "${buttonText}"
+            `;
+        }
+
+        // Загружаем данные при загрузке страницы
+        window.addEventListener('load', loadData);
+    </script>
+</body>
+</html> 

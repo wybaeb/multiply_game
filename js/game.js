@@ -115,11 +115,16 @@ class GameEngine {
         // Если есть сохраненные очки > 0, используем их, иначе начинаем с 0
         if (gameData.totalScore > 0) {
             this.currentScore = gameData.totalScore;
-            console.log('Продолжаем игру с очками:', this.currentScore);
+            this.currentLevel = gameData.currentLevel; // Загружаем сохраненный уровень
+            console.log('Продолжаем игру с очками:', this.currentScore, 'и уровнем:', this.currentLevel);
         } else {
             this.currentScore = 0;
-            console.log('Начинаем новую игру с 0 очков');
+            this.currentLevel = gameData.currentLevel; // Используем сохраненный уровень даже для новой игры
+            console.log('Начинаем новую игру с 0 очков и уровнем:', this.currentLevel);
         }
+        
+        // Устанавливаем уровень в математическом модуле
+        window.mathGame.setLevel(this.currentLevel);
         
         this.timer = 60;
         this.combatActive = false;
@@ -141,6 +146,11 @@ class GameEngine {
         // Запускаем параллакс
         window.gameUI.startParallax();
 
+        // Запускаем музыку игры
+        if (window.musicManager) {
+            window.musicManager.playGameMusic();
+        }
+
         // Запускаем игровой цикл
         this.startGameLoop();
 
@@ -159,13 +169,13 @@ class GameEngine {
         this.isGameRunning = false;
         this.gameState = 'MENU';
 
-        // Сохраняем текущие очки, если они > 0
+        // Сохраняем текущие очки и уровень, если очки > 0
         if (this.currentScore > 0) {
-            console.log('Сохраняем очки при остановке игры:', this.currentScore);
-            window.gameStorage.updateScore(0); // Обновляем только totalScore, не добавляя к нему
-            // Принудительно устанавливаем сохраненные очки
+            console.log('Сохраняем очки и уровень при остановке игры:', this.currentScore, this.currentLevel);
+            // Принудительно устанавливаем сохраненные очки и уровень
             const gameData = window.gameStorage.loadGameData();
             gameData.totalScore = this.currentScore;
+            gameData.currentLevel = this.currentLevel;
             window.gameStorage.saveGameData(gameData);
         }
 
@@ -176,6 +186,11 @@ class GameEngine {
 
         // Останавливаем параллакс
         window.gameUI.stopParallax();
+
+        // Возвращаемся к музыке меню
+        if (window.musicManager) {
+            window.musicManager.playMenuMusic();
+        }
 
         // Скрываем UI
         window.gameUI.hideMathProblem();
@@ -274,6 +289,11 @@ class GameEngine {
         window.monster.setPosition(75, 5);
         window.monster.show();
 
+        // Включаем музыку монстра
+        if (window.musicManager) {
+            window.musicManager.playMonsterMusic();
+        }
+
         // Останавливаем движение персонажа на короткое время
         window.player.stopWalking();
         
@@ -321,6 +341,11 @@ class GameEngine {
         
         // Останавливаем таймер
         this.stopTimer();
+        
+        // Включаем музыку победы
+        if (window.musicManager) {
+            window.musicManager.playVictoryMusic();
+        }
         
         // Анимации
         window.gameUI.animateCorrectAnswer();
@@ -529,6 +554,11 @@ class GameEngine {
         // Скрываем монстра
         window.monster.hide();
 
+        // Возвращаемся к музыке игры
+        if (window.musicManager) {
+            window.musicManager.playGameMusic();
+        }
+
         // Возобновляем движение персонажа
         window.player.startWalking();
 
@@ -555,13 +585,18 @@ class GameEngine {
             
             // Если достигли максимума, начинаем заново
             if (nextSumGroup > 18) {
+                this.currentLevel = 3; // Обновляем уровень в игровом движке
                 window.mathGame.setLevel(3); // Начинаем заново с суммы 3
                 window.gameUI.showMessage('Новый цикл! Начинаем заново!', 'info');
             } else {
                 // Переходим к следующей группе сумм
+                this.currentLevel = nextSumGroup; // Обновляем уровень в игровом движке
                 window.mathGame.setLevel(nextSumGroup);
                 window.gameUI.showMessage(`Новая группа: сумма ${nextSumGroup}!`, 'info');
             }
+            
+            // Сохраняем новый уровень
+            window.gameStorage.updateLevel(this.currentLevel);
             
             // Обновляем сложность монстра
             const difficulty = window.mathGame.getLevelDifficulty();
@@ -626,6 +661,12 @@ class GameEngine {
             this.stopTimer();
             this.stopMonsterSpawn();
             this.stopGameLoop();
+            
+            // Пауза музыки
+            if (window.musicManager) {
+                window.musicManager.pauseMusic();
+            }
+            
             window.gameUI.showMessage('Игра на паузе', 'info');
         }
     }
@@ -641,6 +682,12 @@ class GameEngine {
             if (this.combatActive) {
                 this.startTimer();
             }
+            
+            // Возобновление музыки
+            if (window.musicManager) {
+                window.musicManager.resumeMusic();
+            }
+            
             window.gameUI.showMessage('Игра возобновлена', 'info');
         }
     }
