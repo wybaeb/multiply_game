@@ -303,33 +303,38 @@ class GameEngine {
         // Анимации
         window.gameUI.animateCorrectAnswer();
         window.player.attack();
-        window.monster.takePlayerDamage();
-
-        // Обновляем очки
-        const points = result.points + this.timer * 10; // Бонус за оставшееся время
-        this.currentScore += points;
-        window.gameUI.updateScore(this.currentScore);
-
-        // Анимация монет
-        const coinCount = Math.floor(points / 10);
-        window.gameUI.animateCoins(coinCount);
-
+        
         // Скрываем UI
         window.gameUI.hideMathProblem();
         window.gameUI.hideKeyboard();
         window.gameUI.hideInput();
 
-        // Проверяем, не стали ли очки отрицательными после добавления очков
-        if (this.currentScore < 0) {
-            // Сбрасываем прогресс при отрицательных очках
-            window.gameStorage.resetProgress();
-            this.handleGameOver('Очки стали отрицательными! Игра окончена!');
-        } else {
-            // Анимация победы
-            this.victoryAnimation();
-            // Сохраняем прогресс только если очки не отрицательные
-            window.gameStorage.updateScore(points);
-        }
+        // Ждем завершения анимации атаки, затем обрабатываем результат
+        setTimeout(() => {
+            // Монстр получает урон и исчезает
+            window.monster.takePlayerDamage();
+
+            // Обновляем очки
+            const points = result.points + this.timer * 10; // Бонус за оставшееся время
+            this.currentScore += points;
+            window.gameUI.updateScore(this.currentScore);
+
+            // Анимация монет
+            const coinCount = Math.floor(points / 10);
+            window.gameUI.animateCoins(coinCount);
+
+            // Проверяем, не стали ли очки отрицательными после добавления очков
+            if (this.currentScore < 0) {
+                // Сбрасываем прогресс при отрицательных очках
+                window.gameStorage.resetProgress();
+                this.handleGameOver('Очки стали отрицательными! Игра окончена!');
+            } else {
+                // Анимация победы
+                this.victoryAnimation();
+                // Сохраняем прогресс только если очки не отрицательные
+                window.gameStorage.updateScore(points);
+            }
+        }, 300); // Ждем завершения анимации атаки (200ms blast + 100ms burst)
     }
 
     /**

@@ -294,7 +294,10 @@ class Monster {
         }, 500);
         
         if (this.health <= 0) {
-            this.deathAnimation();
+            // Ждем завершения анимации взрыва, затем исчезаем
+            setTimeout(() => {
+                this.deathAnimation();
+            }, 300); // Время анимации взрыва
         }
         
         return this.health <= 0;

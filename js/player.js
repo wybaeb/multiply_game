@@ -125,7 +125,7 @@ class Player {
         this.currentState = 'attacking';
         this.lastAttackTime = now;
 
-        // Анимация атаки
+        // Анимация атаки (fire*.png)
         this.animate('player-attacking');
 
         // Создание выстрела
@@ -152,6 +152,15 @@ class Player {
         // Адаптивный размер выстрела
         const blastSize = this.spriteSize.width * 0.8;
         
+        // Получаем позицию героя относительно game-objects
+        const gameObjects = document.getElementById('game-objects');
+        const gameObjectsRect = gameObjects.getBoundingClientRect();
+        const playerRect = this.element.getBoundingClientRect();
+        
+        // Позиция blast относительно game-objects (из центра героя по вертикали)
+        const blastX = playerRect.left - gameObjectsRect.left + playerRect.width / 2 - blastSize / 2;
+        const blastY = playerRect.bottom - gameObjectsRect.bottom + playerRect.height / 2 - blastSize / 2;
+        
         blast.style.cssText = `
             position: absolute;
             width: ${blastSize}px;
@@ -161,28 +170,102 @@ class Player {
             background-repeat: no-repeat;
             background-position: center;
             z-index: 16;
-            left: ${this.element.offsetLeft + this.spriteSize.width * 0.5}px;
-            bottom: ${this.element.offsetTop + this.spriteSize.height * 0.3}px;
+            left: ${blastX}px;
+            bottom: ${blastY}px;
             image-rendering: pixelated;
         `;
 
         document.getElementById('game-objects').appendChild(blast);
 
-        // Анимация выстрела
-        setTimeout(() => {
-            blast.style.backgroundImage = "url('sprites/hero/blast2.png')";
-        }, 200);
-
-        // Удаление выстрела
-        setTimeout(() => {
-            if (blast.parentNode) {
-                blast.parentNode.removeChild(blast);
-            }
-        }, 400);
+        // Анимация выстрела - летит к монстру
+        const monsterElement = document.getElementById('monster');
+        if (monsterElement) {
+            const monsterRect = monsterElement.getBoundingClientRect();
+            const blastRect = blast.getBoundingClientRect();
+            
+            // Вычисляем конечную позицию (центр монстра)
+            const endX = monsterRect.left + monsterRect.width / 2 - blastRect.left;
+            const endY = monsterRect.bottom - blastRect.bottom;
+            
+            // Убеждаемся, что blast летит к центру монстра
+            console.log('Blast летит от:', blastRect.left, blastRect.bottom, 'к:', monsterRect.left + monsterRect.width / 2, monsterRect.bottom);
+            
+            // Анимация полета blast к монстру (ускоренная)
+            blast.style.transition = 'all 0.2s ease-out';
+            blast.style.transform = `translate(${endX}px, ${endY}px)`;
+            
+            // Смена спрайта blast на полпути
+            setTimeout(() => {
+                blast.style.backgroundImage = "url('sprites/hero/blast2.png')";
+            }, 100);
+            
+            // Удаление blast и создание взрыва на монстре
+            setTimeout(() => {
+                if (blast.parentNode) {
+                    blast.parentNode.removeChild(blast);
+                }
+                // Создаем взрыв на позиции монстра
+                this.createBurstAtMonster();
+            }, 200);
+        } else {
+            // Если монстр не найден, просто удаляем blast
+            setTimeout(() => {
+                if (blast.parentNode) {
+                    blast.parentNode.removeChild(blast);
+                }
+            }, 400);
+        }
     }
 
     /**
-     * Создание взрыва - адаптивное
+     * Создание взрыва на позиции монстра
+     */
+    createBurstAtMonster() {
+        const monsterElement = document.getElementById('monster');
+        if (!monsterElement) return;
+        
+        const burst = document.createElement('div');
+        burst.className = 'burst-effect';
+        
+        // Адаптивный размер взрыва
+        const burstSize = this.spriteSize.width * 1.5;
+        
+        const monsterRect = monsterElement.getBoundingClientRect();
+        const gameObjects = document.getElementById('game-objects');
+        const gameObjectsRect = gameObjects.getBoundingClientRect();
+        
+        // Позиция взрыва относительно game-objects (центр монстра)
+        const burstX = monsterRect.left - gameObjectsRect.left + monsterRect.width / 2 - burstSize / 2;
+        const burstY = monsterRect.bottom - gameObjectsRect.bottom + monsterRect.height / 2 - burstSize / 2;
+        
+        console.log('Взрыв создается на позиции монстра:', burstX, burstY);
+        
+        burst.style.cssText = `
+            position: absolute;
+            width: ${burstSize}px;
+            height: ${burstSize}px;
+            background-image: url('sprites/hero/burst.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 17;
+            left: ${burstX}px;
+            bottom: ${burstY}px;
+            image-rendering: pixelated;
+        `;
+
+        gameObjects.appendChild(burst);
+
+        // Удаление взрыва
+        setTimeout(() => {
+            if (burst.parentNode) {
+                burst.parentNode.removeChild(burst);
+            }
+        }, 300);
+    }
+
+    /**
+     * Создание взрыва - адаптивное (старый метод, оставляем для совместимости)
      */
     createBurst() {
         const burst = document.createElement('div');
@@ -344,9 +427,7 @@ class Player {
      * Анимация победы
      */
     victoryAnimation() {
-        this.animate('player-bursting');
-        this.createBurst();
-        
+        // Просто возвращаемся к ходьбе, взрыв уже создан в createBurstAtMonster
         setTimeout(() => {
             this.startWalking();
         }, 300);
