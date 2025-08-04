@@ -593,14 +593,7 @@ class GameUI {
             penaltyElement.style.opacity = '0';
         }, 100);
 
-        // Звуковой эффект для штрафа
-        try {
-            const penaltySound = new Audio('sprites/music/catch.mp3');
-            penaltySound.volume = 0.3;
-            penaltySound.play().catch(e => console.log('Не удалось воспроизвести звук штрафа:', e));
-        } catch (e) {
-            console.log('Ошибка создания звука штрафа:', e);
-        }
+
 
         // Удаление элемента штрафа
         setTimeout(() => {
