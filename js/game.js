@@ -29,8 +29,18 @@ class GameEngine {
         
         // Загружаем данные
         const gameData = window.gameStorage.loadGameData();
-        this.currentLevel = gameData.currentLevel;
-        this.currentScore = gameData.totalScore;
+        
+        // Если очки отрицательные, сбрасываем прогресс
+        if (gameData.totalScore < 0) {
+            console.log('Обнаружены отрицательные очки, сбрасываем прогресс');
+            window.gameStorage.resetProgress();
+            const resetData = window.gameStorage.loadGameData();
+            this.currentLevel = resetData.currentLevel;
+            this.currentScore = resetData.totalScore;
+        } else {
+            this.currentLevel = gameData.currentLevel;
+            this.currentScore = gameData.totalScore;
+        }
 
         // Устанавливаем уровень в математическом модуле
         window.mathGame.setLevel(this.currentLevel);
@@ -98,7 +108,7 @@ class GameEngine {
         
         this.gameState = 'RUNNING';
         this.isGameRunning = true;
-        this.currentScore = 0;
+        this.currentScore = 0; // Сбрасываем счетчик для новой игры
         this.timer = 60;
         this.combatActive = false;
         this.lastAnswerCorrect = false;
@@ -112,6 +122,9 @@ class GameEngine {
 
         // Показываем персонажа
         window.player.show();
+
+        // Обновляем отображение счета
+        window.gameUI.updateScore(this.currentScore);
 
         // Запускаем параллакс
         window.gameUI.startParallax();
@@ -308,14 +321,15 @@ class GameEngine {
 
         // Проверяем, не стали ли очки отрицательными после добавления очков
         if (this.currentScore < 0) {
+            // Сбрасываем прогресс при отрицательных очках
+            window.gameStorage.resetProgress();
             this.handleGameOver('Очки стали отрицательными! Игра окончена!');
         } else {
             // Анимация победы
             this.victoryAnimation();
+            // Сохраняем прогресс только если очки не отрицательные
+            window.gameStorage.updateScore(points);
         }
-
-        // Сохраняем прогресс
-        window.gameStorage.updateScore(points);
     }
 
     /**
@@ -357,6 +371,8 @@ class GameEngine {
         // Проверяем здоровье игрока и отрицательные очки
         if (!window.player.isAlive() || this.currentScore < 0) {
             if (this.currentScore < 0) {
+                // Сбрасываем прогресс при отрицательных очках
+                window.gameStorage.resetProgress();
                 this.handleGameOver('Очки стали отрицательными! Игра окончена!');
             } else {
                 this.handlePlayerDeath();
@@ -366,10 +382,9 @@ class GameEngine {
             setTimeout(() => {
                 this.continueAfterCombat();
             }, 2000);
+            // Сохраняем прогресс только если очки не отрицательные
+            window.gameStorage.updateScore(-penalty);
         }
-
-        // Сохраняем прогресс (отрицательные очки)
-        window.gameStorage.updateScore(-penalty);
     }
 
     /**
@@ -410,7 +425,15 @@ class GameEngine {
         console.log('Игра окончена:', message);
         
         window.player.defeatAnimation();
-        window.gameUI.showMessage(message, 'error');
+        
+        // Если очки отрицательные, сразу сбрасываем прогресс и не показываем сообщение об ошибке
+        if (this.currentScore < 0) {
+            console.log('Сбрасываем прогресс из-за отрицательных очков');
+            window.gameStorage.resetProgress();
+        } else {
+            // Показываем сообщение только если не отрицательные очки
+            window.gameUI.showMessage(message, 'error');
+        }
 
         // Останавливаем игру через некоторое время
         setTimeout(() => {
@@ -453,6 +476,8 @@ class GameEngine {
         // Проверяем здоровье игрока и отрицательные очки
         if (!window.player.isAlive() || this.currentScore < 0) {
             if (this.currentScore < 0) {
+                // Сбрасываем прогресс при отрицательных очках
+                window.gameStorage.resetProgress();
                 this.handleGameOver('Очки стали отрицательными! Игра окончена!');
             } else {
                 this.handlePlayerDeath();
@@ -462,10 +487,9 @@ class GameEngine {
             setTimeout(() => {
                 this.continueAfterCombat();
             }, 2000);
+            // Сохраняем прогресс только если очки не отрицательные
+            window.gameStorage.updateScore(-penalty);
         }
-        
-        // Сохраняем прогресс (отрицательные очки)
-        window.gameStorage.updateScore(-penalty);
     }
 
     /**
