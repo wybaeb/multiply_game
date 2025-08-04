@@ -432,8 +432,37 @@ class GameUI {
         // Адаптивный размер монеты
         const coinSize = Math.max(20, Math.min(40, Math.min(window.innerWidth, window.innerHeight) / 30));
         
+        // Получаем позиции таймера и счетчика очков
+        const timerContainer = document.getElementById('timer-container');
+        const scoreContainer = document.getElementById('score-container');
+        
+        let startX, startY, endX, endY;
+        
+        if (timerContainer && scoreContainer) {
+            const timerRect = timerContainer.getBoundingClientRect();
+            const scoreRect = scoreContainer.getBoundingClientRect();
+            
+            // Начальная позиция - центр таймера
+            startX = timerRect.left + timerRect.width / 2;
+            startY = timerRect.top + timerRect.height / 2;
+            
+            // Конечная позиция - центр счетчика очков
+            endX = scoreRect.left + scoreRect.width / 2;
+            endY = scoreRect.top + scoreRect.height / 2;
+        } else {
+            // Fallback позиции если элементы не найдены
+            startX = window.innerWidth / 2; // центр экрана по горизонтали
+            startY = window.innerHeight - 50; // нижняя часть экрана
+            endX = window.innerWidth - 50; // правый край экрана
+            endY = 50; // верхняя часть экрана
+        }
+        
+        // Добавляем небольшое случайное смещение для более естественной анимации
+        const randomOffsetX = (Math.random() - 0.5) * 20;
+        const randomOffsetY = (Math.random() - 0.5) * 20;
+        
         coin.style.cssText = `
-            position: absolute;
+            position: fixed;
             width: ${coinSize}px;
             height: ${coinSize}px;
             background-image: url('sprites/coin/coin1.png');
@@ -441,8 +470,8 @@ class GameUI {
             background-repeat: no-repeat;
             background-position: center;
             z-index: 30;
-            left: 50%;
-            top: 50%;
+            left: ${startX + randomOffsetX}px;
+            top: ${startY + randomOffsetY}px;
             transform: translate(-50%, -50%);
             image-rendering: pixelated;
         `;
@@ -452,6 +481,9 @@ class GameUI {
         // Анимация полета монеты
         setTimeout(() => {
             coin.classList.add('coin-fly');
+            // Устанавливаем конечную позицию через CSS переменные
+            coin.style.setProperty('--end-x', `${endX - startX - randomOffsetX}px`);
+            coin.style.setProperty('--end-y', `${endY - startY - randomOffsetY}px`);
         }, 100);
 
         // Удаление монеты
