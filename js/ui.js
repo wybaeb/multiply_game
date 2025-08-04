@@ -1,0 +1,626 @@
+/**
+ * Модуль для управления пользовательским интерфейсом - адаптивный
+ */
+
+class GameUI {
+    constructor() {
+        this.elements = this.initializeElements();
+        this.currentInput = '';
+        this.isKeyboardVisible = false;
+        this.isInputVisible = false;
+        this.parallaxLayers = [];
+        this.parallaxActive = false;
+        this.bindEvents();
+        this.initResizeHandler();
+    }
+
+    /**
+     * Инициализация элементов UI
+     */
+    initializeElements() {
+        return {
+            // Экраны
+            loadingScreen: document.getElementById('loading-screen'),
+            menuScreen: document.getElementById('menu-screen'),
+            
+            // Игровые элементы
+            gameContainer: document.getElementById('game-container'),
+            parallaxContainer: document.getElementById('parallax-container'),
+            gameObjects: document.getElementById('game-objects'),
+            uiContainer: document.getElementById('ui-container'),
+            
+            // Персонажи
+            player: document.getElementById('player'),
+            playerSprite: document.getElementById('player-sprite'),
+            monster: document.getElementById('monster'),
+            monsterSprite: document.getElementById('monster-sprite'),
+            
+            // UI элементы
+            resetBtn: document.getElementById('reset-btn'),
+            scoreContainer: document.getElementById('score-container'),
+            scoreText: document.getElementById('score-text'),
+            scoreAnimation: document.getElementById('score-animation'),
+            timerContainer: document.getElementById('timer-container'),
+            timerBar: document.getElementById('timer-bar'),
+            timerText: document.getElementById('timer-text'),
+            
+            // Математические элементы
+            mathProblem: document.getElementById('math-problem'),
+            problemText: document.getElementById('problem-text'),
+            keyboard: document.getElementById('keyboard'),
+            inputContainer: document.getElementById('input-container'),
+            answerInput: document.getElementById('answer-input'),
+            
+            // Меню
+            currentLevel: document.getElementById('current-level'),
+            totalScore: document.getElementById('total-score'),
+            startGameBtn: document.getElementById('start-game-btn'),
+            resetProgressBtn: document.getElementById('reset-progress-btn'),
+            
+            // Эффекты
+            effectsContainer: document.getElementById('effects-container')
+        };
+    }
+
+    /**
+     * Обработчик изменения размера окна
+     */
+    initResizeHandler() {
+        window.addEventListener('resize', () => {
+            this.updateUIScaling();
+        });
+    }
+
+    /**
+     * Обновление масштабирования UI
+     */
+    updateUIScaling() {
+        // Обновляем размеры элементов в зависимости от размера экрана
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        // Масштабируем шрифты
+        const baseFontSize = Math.min(screenWidth, screenHeight) / 50;
+        
+        // Обновляем размеры кнопок клавиатуры
+        const keyButtons = document.querySelectorAll('.key-btn');
+        const keySize = Math.max(30, Math.min(60, Math.min(screenWidth, screenHeight) / 20));
+        
+        keyButtons.forEach(btn => {
+            btn.style.width = `${keySize}px`;
+            btn.style.height = `${keySize}px`;
+            btn.style.fontSize = `${Math.max(10, keySize / 4)}px`;
+        });
+        
+        // Обновляем размеры таймера
+        if (this.elements.timerContainer) {
+            const timerWidth = Math.max(200, Math.min(400, screenWidth * 0.3));
+            const timerHeight = Math.max(25, Math.min(50, screenHeight * 0.05));
+            this.elements.timerContainer.style.width = `${timerWidth}px`;
+            this.elements.timerContainer.style.height = `${timerHeight}px`;
+        }
+        
+        // Обновляем размеры поля ввода
+        if (this.elements.answerInput) {
+            const inputWidth = Math.max(150, Math.min(250, screenWidth * 0.2));
+            const inputHeight = Math.max(40, Math.min(60, screenHeight * 0.05));
+            this.elements.answerInput.style.width = `${inputWidth}px`;
+            this.elements.answerInput.style.height = `${inputHeight}px`;
+        }
+    }
+
+    /**
+     * Привязка событий
+     */
+    bindEvents() {
+        // Кнопка сброса
+        this.elements.resetBtn.addEventListener('click', () => {
+            this.showMenu();
+        });
+
+        // Кнопки клавиатуры
+        document.querySelectorAll('.key-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const digit = e.target.dataset.digit;
+                if (digit) {
+                    this.handleKeyPress(digit);
+                }
+            });
+        });
+
+        // Кнопка очистки
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            this.clearInput();
+        });
+
+        // Кнопка ввода
+        document.getElementById('enter-btn').addEventListener('click', () => {
+            this.submitAnswer();
+        });
+
+        // Кнопки меню
+        this.elements.startGameBtn.addEventListener('click', () => {
+            this.hideMenu();
+            if (window.gameEngine) {
+                window.gameEngine.startGame();
+            }
+        });
+
+        this.elements.resetProgressBtn.addEventListener('click', () => {
+            if (confirm('Вы уверены, что хотите начать заново? Весь прогресс будет потерян.')) {
+                if (window.gameEngine) {
+                    window.gameEngine.reset();
+                }
+            }
+        });
+
+        // Обработка клавиатуры
+        document.addEventListener('keydown', (e) => {
+            this.handleKeyboardInput(e);
+        });
+    }
+
+    /**
+     * Обработка нажатия клавиши
+     */
+    handleKeyPress(digit) {
+        if (this.currentInput.length < 3) {
+            this.currentInput += digit;
+            this.updateInputDisplay();
+        }
+    }
+
+    /**
+     * Обработка ввода с клавиатуры
+     */
+    handleKeyboardInput(e) {
+        if (!this.isKeyboardVisible) return;
+
+        if (e.key >= '0' && e.key <= '9') {
+            this.handleKeyPress(e.key);
+        } else if (e.key === 'Enter') {
+            this.submitAnswer();
+        } else if (e.key === 'Backspace' || e.key === 'Delete') {
+            this.clearInput();
+        }
+    }
+
+    /**
+     * Очистка ввода
+     */
+    clearInput() {
+        this.currentInput = '';
+        this.updateInputDisplay();
+    }
+
+    /**
+     * Обновление отображения ввода
+     */
+    updateInputDisplay() {
+        if (this.elements.answerInput) {
+            this.elements.answerInput.value = this.currentInput;
+        }
+    }
+
+    /**
+     * Отправка ответа
+     */
+    submitAnswer() {
+        if (this.currentInput && window.gameEngine) {
+            const answer = parseInt(this.currentInput);
+            window.gameEngine.checkAnswer(answer);
+            this.currentInput = '';
+            this.updateInputDisplay();
+        }
+    }
+
+    /**
+     * Показ экрана загрузки
+     */
+    showLoading() {
+        this.hideAllScreens();
+        this.elements.loadingScreen.classList.remove('hidden');
+    }
+
+    /**
+     * Скрытие экрана загрузки
+     */
+    hideLoading() {
+        this.elements.loadingScreen.classList.add('hidden');
+    }
+
+    /**
+     * Показ меню
+     */
+    showMenu() {
+        this.hideAllScreens();
+        this.elements.menuScreen.classList.remove('hidden');
+        this.updateMenuStats();
+    }
+
+    /**
+     * Скрытие меню
+     */
+    hideMenu() {
+        this.elements.menuScreen.classList.add('hidden');
+    }
+
+    /**
+     * Скрытие всех экранов
+     */
+    hideAllScreens() {
+        this.elements.loadingScreen.classList.add('hidden');
+        this.elements.menuScreen.classList.add('hidden');
+    }
+
+    /**
+     * Обновление статистики в меню
+     */
+    updateMenuStats() {
+        if (window.gameStorage) {
+            const gameData = window.gameStorage.loadGameData();
+            if (this.elements.currentLevel) {
+                this.elements.currentLevel.textContent = gameData.currentLevel;
+            }
+            if (this.elements.totalScore) {
+                this.elements.totalScore.textContent = gameData.totalScore;
+            }
+        }
+    }
+
+    /**
+     * Обновление счета
+     */
+    updateScore(score) {
+        if (this.elements.scoreText) {
+            this.elements.scoreText.textContent = score;
+            this.animateScore();
+        }
+    }
+
+    /**
+     * Анимация счета
+     */
+    animateScore() {
+        if (this.elements.scoreAnimation) {
+            this.elements.scoreAnimation.classList.add('score-coin-spin');
+            setTimeout(() => {
+                this.elements.scoreAnimation.classList.remove('score-coin-spin');
+            }, 600);
+        }
+    }
+
+    /**
+     * Обновление таймера
+     */
+    updateTimer(seconds) {
+        if (this.elements.timerText) {
+            this.elements.timerText.textContent = seconds;
+        }
+        
+        if (this.elements.timerBar) {
+            const percentage = (seconds / 60) * 100;
+            this.elements.timerBar.style.width = `${percentage}%`;
+            
+            // Добавляем предупреждение при малом времени
+            if (seconds <= 10) {
+                this.elements.timerContainer.classList.add('timer-warning');
+            } else {
+                this.elements.timerContainer.classList.remove('timer-warning');
+            }
+        }
+    }
+
+    /**
+     * Показ математической задачи
+     */
+    showMathProblem(problemText) {
+        if (this.elements.problemText) {
+            this.elements.problemText.textContent = problemText;
+        }
+        if (this.elements.mathProblem) {
+            this.elements.mathProblem.classList.remove('hidden');
+            this.elements.mathProblem.classList.add('fade-in');
+        }
+    }
+
+    /**
+     * Скрытие математической задачи
+     */
+    hideMathProblem() {
+        if (this.elements.mathProblem) {
+            this.elements.mathProblem.classList.add('fade-out');
+            setTimeout(() => {
+                this.elements.mathProblem.classList.add('hidden');
+                this.elements.mathProblem.classList.remove('fade-out');
+            }, 300);
+        }
+    }
+
+    /**
+     * Показ клавиатуры
+     */
+    showKeyboard() {
+        if (this.elements.keyboard) {
+            this.elements.keyboard.classList.remove('hidden');
+            this.elements.keyboard.classList.add('slide-in-right');
+            this.isKeyboardVisible = true;
+        }
+    }
+
+    /**
+     * Скрытие клавиатуры
+     */
+    hideKeyboard() {
+        if (this.elements.keyboard) {
+            this.elements.keyboard.classList.add('slide-out-right');
+            setTimeout(() => {
+                this.elements.keyboard.classList.add('hidden');
+                this.elements.keyboard.classList.remove('slide-out-right');
+            }, 500);
+            this.isKeyboardVisible = false;
+        }
+    }
+
+    /**
+     * Показ поля ввода
+     */
+    showInput() {
+        if (this.elements.inputContainer) {
+            this.elements.inputContainer.classList.remove('hidden');
+            this.elements.inputContainer.classList.add('fade-in');
+            this.isInputVisible = true;
+        }
+    }
+
+    /**
+     * Скрытие поля ввода
+     */
+    hideInput() {
+        if (this.elements.inputContainer) {
+            this.elements.inputContainer.classList.add('fade-out');
+            setTimeout(() => {
+                this.elements.inputContainer.classList.add('hidden');
+                this.elements.inputContainer.classList.remove('fade-out');
+            }, 300);
+            this.isInputVisible = false;
+        }
+    }
+
+    /**
+     * Анимация правильного ответа
+     */
+    animateCorrectAnswer() {
+        if (this.elements.mathProblem) {
+            this.elements.mathProblem.classList.add('correct-answer');
+            setTimeout(() => {
+                this.elements.mathProblem.classList.remove('correct-answer');
+            }, 500);
+        }
+    }
+
+    /**
+     * Анимация неправильного ответа
+     */
+    animateWrongAnswer() {
+        if (this.elements.mathProblem) {
+            this.elements.mathProblem.classList.add('wrong-answer');
+            setTimeout(() => {
+                this.elements.mathProblem.classList.remove('wrong-answer');
+            }, 500);
+        }
+    }
+
+    /**
+     * Анимация монет
+     */
+    animateCoins(count = 1) {
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                this.createCoinAnimation();
+            }, i * 100);
+        }
+    }
+
+    /**
+     * Создание анимации монеты
+     */
+    createCoinAnimation() {
+        const coin = document.createElement('div');
+        coin.className = 'coin-animation';
+        
+        // Адаптивный размер монеты
+        const coinSize = Math.max(20, Math.min(40, Math.min(window.innerWidth, window.innerHeight) / 30));
+        
+        coin.style.cssText = `
+            position: absolute;
+            width: ${coinSize}px;
+            height: ${coinSize}px;
+            background-image: url('sprites/coin/coin1.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 30;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            image-rendering: pixelated;
+        `;
+
+        document.body.appendChild(coin);
+
+        // Анимация полета монеты
+        setTimeout(() => {
+            coin.classList.add('coin-fly');
+        }, 100);
+
+        // Удаление монеты
+        setTimeout(() => {
+            if (coin.parentNode) {
+                coin.parentNode.removeChild(coin);
+            }
+        }, 800);
+    }
+
+    /**
+     * Показ персонажа
+     */
+    showPlayer() {
+        if (this.elements.player) {
+            this.elements.player.classList.remove('hidden');
+        }
+    }
+
+    /**
+     * Скрытие персонажа
+     */
+    hidePlayer() {
+        if (this.elements.player) {
+            this.elements.player.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Показ монстра
+     */
+    showMonster() {
+        if (this.elements.monster) {
+            this.elements.monster.classList.remove('hidden');
+        }
+    }
+
+    /**
+     * Скрытие монстра
+     */
+    hideMonster() {
+        if (this.elements.monster) {
+            this.elements.monster.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Анимация персонажа
+     */
+    animatePlayer(action) {
+        if (this.elements.playerSprite) {
+            this.elements.playerSprite.className = action;
+        }
+    }
+
+    /**
+     * Анимация монстра
+     */
+    animateMonster(action) {
+        if (this.elements.monsterSprite) {
+            this.elements.monsterSprite.className = action;
+        }
+    }
+
+    /**
+     * Запуск параллакса
+     */
+    startParallax() {
+        if (this.parallaxActive) return;
+        
+        this.parallaxActive = true;
+        this.parallaxLayers = [
+            document.getElementById('bg-layer-1'),
+            document.getElementById('bg-layer-2'),
+            document.getElementById('bg-layer-3'),
+            document.getElementById('bg-layer-4')
+        ];
+
+        this.parallaxLayers.forEach((layer, index) => {
+            if (layer) {
+                const speed = 30 - (index * 5); // Разные скорости для слоев
+                layer.style.animation = `parallax-slow ${speed}s linear infinite`;
+            }
+        });
+    }
+
+    /**
+     * Остановка параллакса
+     */
+    stopParallax() {
+        this.parallaxActive = false;
+        this.parallaxLayers.forEach(layer => {
+            if (layer) {
+                layer.style.animation = 'none';
+            }
+        });
+    }
+
+    /**
+     * Показ сообщения
+     */
+    showMessage(message, type = 'info') {
+        const messageElement = document.createElement('div');
+        messageElement.className = `message message-${type}`;
+        messageElement.textContent = message;
+        
+        // Адаптивные стили для сообщения
+        const fontSize = Math.max(14, Math.min(24, Math.min(window.innerWidth, window.innerHeight) / 40));
+        
+        messageElement.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border: 3px solid #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: ${fontSize}px;
+            z-index: 1000;
+            text-align: center;
+        `;
+
+        document.body.appendChild(messageElement);
+
+        // Удаление сообщения
+        setTimeout(() => {
+            if (messageElement.parentNode) {
+                messageElement.parentNode.removeChild(messageElement);
+            }
+        }, 3000);
+    }
+
+    /**
+     * Сброс UI
+     */
+    reset() {
+        this.currentInput = '';
+        this.isKeyboardVisible = false;
+        this.isInputVisible = false;
+        this.updateInputDisplay();
+        this.hideMathProblem();
+        this.hideKeyboard();
+        this.hideInput();
+        this.updateUIScaling();
+    }
+
+    /**
+     * Получение текущего ввода
+     */
+    getCurrentInput() {
+        return this.currentInput;
+    }
+
+    /**
+     * Проверка, показана ли клавиатура
+     */
+    isKeyboardShown() {
+        return this.isKeyboardVisible;
+    }
+
+    /**
+     * Проверка, показано ли поле ввода
+     */
+    isInputShown() {
+        return this.isInputVisible;
+    }
+}
+
+// Создаем глобальный экземпляр
+window.gameUI = new GameUI(); 

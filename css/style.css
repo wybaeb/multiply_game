@@ -1,0 +1,501 @@
+/* Основные стили для игры "Таблица умножения" */
+
+/* Сброс стилей */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Основные настройки */
+body {
+    font-family: 'VT323', monospace;
+    background: #000;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Игровой контейнер - адаптивный */
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #000;
+    display: flex;
+}
+
+/* Параллакс фоны - адаптивные */
+#parallax-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background-size: 50% 100%;
+    background-repeat: repeat-x;
+    background-position: 0 0;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+#bg-layer-1 {
+    background-image: url('../sprites/location1/bg1.png');
+    z-index: 1;
+}
+
+#bg-layer-2 {
+    background-image: url('../sprites/location1/bg2.png');
+    z-index: 2;
+}
+
+#bg-layer-3 {
+    background-image: url('../sprites/location1/bg3.png');
+    z-index: 3;
+}
+
+#bg-layer-4 {
+    background-image: url('../sprites/location1/bg4.png');
+    z-index: 4;
+}
+
+/* Игровые объекты - адаптивные */
+#game-objects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+.game-sprite {
+    position: absolute;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    transform-origin: center bottom;
+}
+
+#player {
+    left: 20%;
+    bottom: 20%;
+    z-index: 15;
+}
+
+#player-sprite {
+    width: clamp(60px, 8vw, 120px);
+    height: clamp(60px, 8vw, 120px);
+    image-rendering: pixelated;
+}
+
+#monster {
+    right: -150px;
+    bottom: 20%;
+    z-index: 14;
+}
+
+#monster-sprite {
+    width: clamp(50px, 6vw, 100px);
+    height: clamp(50px, 6vw, 100px);
+    image-rendering: pixelated;
+}
+
+/* UI элементы - адаптивные */
+#ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    pointer-events: none;
+}
+
+/* Кнопка сброса - левый верхний угол */
+#reset-btn {
+    position: absolute;
+    top: clamp(10px, 2vh, 20px);
+    left: clamp(10px, 2vw, 20px);
+    padding: clamp(8px, 1.5vh, 15px) clamp(12px, 2vw, 20px);
+    background: #ff4444;
+    color: white;
+    border: 3px solid #000;
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(10px, 1.5vw, 14px);
+    cursor: pointer;
+    pointer-events: auto;
+    image-rendering: pixelated;
+    box-shadow: 3px 3px 0 #000;
+}
+
+#reset-btn:hover {
+    background: #ff6666;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 #000;
+}
+
+#reset-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+/* Счетчик очков - правый верхний угол */
+#score-container {
+    position: absolute;
+    top: clamp(10px, 2vh, 20px);
+    right: clamp(10px, 2vw, 20px);
+    display: flex;
+    align-items: center;
+    gap: clamp(5px, 1vw, 10px);
+    pointer-events: auto;
+}
+
+#score-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(16px, 3vw, 24px);
+    color: #ffff00;
+    text-shadow: 2px 2px 0 #000;
+}
+
+#score-animation {
+    width: clamp(20px, 3vw, 30px);
+    height: clamp(20px, 3vw, 30px);
+    background-image: url('../sprites/coin/coin1.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+/* Таймер - нижний центр */
+#timer-container {
+    position: absolute;
+    bottom: clamp(10px, 2vh, 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(250px, 30vw, 400px);
+    height: clamp(30px, 4vh, 50px);
+    background: #333;
+    border: 3px solid #000;
+    pointer-events: auto;
+}
+
+#timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff00, #ffff00, #ff0000);
+    width: 100%;
+    transition: width 1s linear;
+}
+
+#timer-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(12px, 2vw, 18px);
+    color: #000;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+/* Математическая задача - центр экрана */
+#math-problem {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #fff;
+    padding: clamp(15px, 3vh, 25px);
+    pointer-events: auto;
+    min-width: clamp(200px, 25vw, 300px);
+}
+
+#problem-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(18px, 3vw, 28px);
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    text-align: center;
+}
+
+/* Цифровая клавиатура - правый нижний угол */
+#keyboard {
+    position: absolute;
+    bottom: clamp(10px, 2vh, 20px);
+    right: clamp(10px, 2vw, 20px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3px, 0.5vh, 5px);
+    pointer-events: auto;
+    z-index: 25;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: clamp(3px, 0.5vw, 5px);
+    justify-content: center;
+}
+
+.key-btn {
+    width: clamp(35px, 5vw, 60px);
+    height: clamp(35px, 5vw, 60px);
+    background: #444;
+    color: #fff;
+    border: 3px solid #000;
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(10px, 1.5vw, 16px);
+    cursor: pointer;
+    image-rendering: pixelated;
+    box-shadow: 3px 3px 0 #000;
+}
+
+.key-btn:hover {
+    background: #666;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 #000;
+}
+
+.key-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+#clear-btn {
+    background: #ff4444;
+}
+
+#enter-btn {
+    background: #44ff44;
+}
+
+/* Поле ввода - под задачей */
+#input-container {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: auto;
+}
+
+#answer-input {
+    width: clamp(150px, 20vw, 250px);
+    height: clamp(40px, 5vh, 60px);
+    background: #fff;
+    border: 3px solid #000;
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(14px, 2.5vw, 22px);
+    text-align: center;
+    image-rendering: pixelated;
+}
+
+/* Экран загрузки */
+#loading-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.loading-content {
+    text-align: center;
+    color: #fff;
+}
+
+.loading-content h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(18px, 4vw, 32px);
+    margin-bottom: clamp(20px, 4vh, 40px);
+    color: #ffff00;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.loading-bar {
+    width: clamp(250px, 30vw, 400px);
+    height: clamp(15px, 2vh, 25px);
+    background: #333;
+    border: 2px solid #fff;
+    margin: clamp(15px, 3vh, 25px) 0;
+}
+
+.loading-progress {
+    height: 100%;
+    background: #00ff00;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.loading-text {
+    font-family: 'VT323', monospace;
+    font-size: clamp(14px, 2.5vw, 20px);
+    color: #fff;
+}
+
+/* Главное меню */
+#menu-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 90;
+}
+
+.menu-content {
+    text-align: center;
+    color: #fff;
+    padding: clamp(20px, 4vw, 40px);
+}
+
+.menu-content h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(20px, 4vw, 36px);
+    margin-bottom: clamp(20px, 4vh, 40px);
+    color: #ffff00;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.menu-stats {
+    margin: clamp(15px, 3vh, 25px) 0;
+    font-family: 'VT323', monospace;
+    font-size: clamp(14px, 2.5vw, 20px);
+}
+
+.menu-stats p {
+    margin: clamp(8px, 1.5vh, 12px) 0;
+}
+
+/* Кнопки */
+.pixel-btn {
+    display: block;
+    margin: clamp(8px, 1.5vh, 12px) auto;
+    padding: clamp(12px, 2vh, 20px) clamp(25px, 4vw, 35px);
+    background: #4444ff;
+    color: white;
+    border: 3px solid #000;
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(12px, 2vw, 16px);
+    cursor: pointer;
+    image-rendering: pixelated;
+    box-shadow: 3px 3px 0 #000;
+    pointer-events: auto;
+}
+
+.pixel-btn:hover {
+    background: #6666ff;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 #000;
+}
+
+.pixel-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+/* Утилиты */
+.hidden {
+    display: none !important;
+}
+
+.pixel-text {
+    font-family: 'Press Start 2P', cursive;
+    image-rendering: pixelated;
+}
+
+/* Адаптация для разных размеров экрана */
+@media screen and (max-width: 768px) {
+    #keyboard {
+        bottom: 5px;
+        right: 5px;
+    }
+    
+    .key-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 10px;
+    }
+    
+    #timer-container {
+        width: 200px;
+        height: 25px;
+    }
+    
+    #timer-text {
+        font-size: 12px;
+    }
+    
+    #math-problem {
+        top: 35%;
+        padding: 15px;
+    }
+    
+    #input-container {
+        top: 50%;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    #player-sprite {
+        width: 120px;
+        height: 120px;
+    }
+    
+    #monster-sprite {
+        width: 100px;
+        height: 100px;
+    }
+    
+    #keyboard {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .key-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 16px;
+    }
+}
+
+/* Анимации для монет */
+@keyframes coin-spin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+@keyframes coin-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.coin-animation {
+    animation: coin-spin 0.5s linear infinite;
+}
+
+.coin-bounce {
+    animation: coin-bounce 0.3s ease-in-out;
+} 

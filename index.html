@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Таблица умножения - Игра</title>
+    
+    <!-- Пиксельные шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <!-- Игровое поле -->
+    <div id="game-container">
+        <!-- Параллакс фоны -->
+        <div id="parallax-container">
+            <div class="parallax-layer" id="bg-layer-1"></div>
+            <div class="parallax-layer" id="bg-layer-2"></div>
+            <div class="parallax-layer" id="bg-layer-3"></div>
+            <div class="parallax-layer" id="bg-layer-4"></div>
+        </div>
+        
+        <!-- Игровые объекты -->
+        <div id="game-objects">
+            <!-- Персонаж -->
+            <div id="player" class="game-sprite">
+                <img id="player-sprite" src="sprites/hero/walk1.png" alt="Персонаж">
+            </div>
+            
+            <!-- Монстр -->
+            <div id="monster" class="game-sprite hidden">
+                <img id="monster-sprite" src="sprites/monstr1/walk1.png" alt="Монстр">
+            </div>
+            
+            <!-- Эффекты -->
+            <div id="effects-container"></div>
+        </div>
+        
+        <!-- UI элементы -->
+        <div id="ui-container">
+            <!-- Кнопка сброса -->
+            <button id="reset-btn" class="pixel-btn">Сброс</button>
+            
+            <!-- Счетчик очков -->
+            <div id="score-container">
+                <div id="score-animation"></div>
+                <span id="score-text">0</span>
+            </div>
+            
+            <!-- Таймер -->
+            <div id="timer-container">
+                <div id="timer-bar"></div>
+                <span id="timer-text">60</span>
+            </div>
+            
+            <!-- Задача -->
+            <div id="math-problem" class="hidden">
+                <span id="problem-text">2 × 3 = ?</span>
+            </div>
+            
+            <!-- Цифровая клавиатура -->
+            <div id="keyboard" class="hidden">
+                <div class="keyboard-row">
+                    <button class="key-btn" data-digit="1">1</button>
+                    <button class="key-btn" data-digit="2">2</button>
+                    <button class="key-btn" data-digit="3">3</button>
+                </div>
+                <div class="keyboard-row">
+                    <button class="key-btn" data-digit="4">4</button>
+                    <button class="key-btn" data-digit="5">5</button>
+                    <button class="key-btn" data-digit="6">6</button>
+                </div>
+                <div class="keyboard-row">
+                    <button class="key-btn" data-digit="7">7</button>
+                    <button class="key-btn" data-digit="8">8</button>
+                    <button class="key-btn" data-digit="9">9</button>
+                </div>
+                <div class="keyboard-row">
+                    <button class="key-btn" data-digit="0">0</button>
+                    <button class="key-btn" id="clear-btn">C</button>
+                    <button class="key-btn" id="enter-btn">✓</button>
+                </div>
+            </div>
+            
+            <!-- Поле ввода -->
+            <div id="input-container" class="hidden">
+                <input type="text" id="answer-input" maxlength="3" readonly>
+            </div>
+        </div>
+        
+        <!-- Экран загрузки -->
+        <div id="loading-screen">
+            <div class="loading-content">
+                <h1 class="pixel-text">Таблица умножения</h1>
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+                <p class="loading-text">Загрузка...</p>
+            </div>
+        </div>
+        
+        <!-- Главное меню -->
+        <div id="menu-screen" class="hidden">
+            <div class="menu-content">
+                <h1 class="pixel-text">Таблица умножения</h1>
+                <div class="menu-stats">
+                    <p>Уровень: <span id="current-level">1</span></p>
+                    <p>Очки: <span id="total-score">0</span></p>
+                </div>
+                <button id="start-game-btn" class="pixel-btn">Начать игру</button>
+                <button id="reset-progress-btn" class="pixel-btn">Начать заново</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Скрипты -->
+    <script src="js/storage.js"></script>
+    <script src="js/math.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/monster.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html> 
