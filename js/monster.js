@@ -9,7 +9,7 @@ class Monster {
         this.currentState = 'idle';
         this.isAttacking = false;
         this.isMoving = false;
-        this.position = { x: 80, y: 20 }; // в процентах
+        this.position = { x: 75, y: 5 }; // в процентах
         this.health = 100;
         this.maxHealth = 100;
         this.difficulty = 1;
@@ -19,6 +19,7 @@ class Monster {
         this.lastAttackTime = 0;
         this.spriteSize = this.calculateSpriteSize();
         this.initResizeHandler();
+        this.setPosition(this.position.x, this.position.y);
     }
 
     /**
@@ -121,8 +122,8 @@ class Monster {
     autoMove() {
         if (!this.isMoving) return;
 
-        const currentLeft = parseFloat(this.element.style.left) || 80;
-        const targetLeft = 60; // Позиция для атаки
+        const currentLeft = parseFloat(this.element.style.left) || 75;
+        const targetLeft = 65; // Позиция для атаки - не заходит за клавиатуру
 
         if (currentLeft > targetLeft) {
             const newLeft = currentLeft - this.moveSpeed;
@@ -316,7 +317,7 @@ class Monster {
         this.isAttacking = false;
         this.isMoving = false;
         this.lastAttackTime = 0;
-        this.setPosition(80, 5);
+        this.setPosition(75, 5);
         this.updateSpriteSize();
         this.animate('idle');
         this.element.classList.remove('monster-appear', 'monster-disappear');

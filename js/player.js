@@ -9,7 +9,7 @@ class Player {
         this.currentState = 'idle';
         this.isAttacking = false;
         this.isMoving = false;
-        this.position = { x: 20, y: 20 }; // в процентах
+        this.position = { x: 20, y: 5 }; // в процентах
         this.health = 100;
         this.maxHealth = 100;
         this.attackCooldown = 0;
@@ -17,6 +17,7 @@ class Player {
         this.lastAttackTime = 0;
         this.spriteSize = this.calculateSpriteSize();
         this.initResizeHandler();
+        this.setPosition(this.position.x, this.position.y);
     }
 
     /**
