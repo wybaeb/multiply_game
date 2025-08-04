@@ -122,8 +122,8 @@ body {
 }
 
 #monster-sprite {
-    width: clamp(200px, 24vw, 320px);
-    height: clamp(200px, 24vw, 320px);
+    width: clamp(240px, 30vw, 400px);
+    height: clamp(240px, 30vw, 400px);
     background-image: url('../sprites/monstr1/walk1.png');
 }
 
@@ -477,8 +477,8 @@ body {
     }
     
     #monster-sprite {
-        width: 320px;
-        height: 320px;
+        width: 400px;
+        height: 400px;
     }
     
     #keyboard {
