@@ -255,12 +255,16 @@ body {
     gap: clamp(3px, 0.5vh, 5px);
     pointer-events: auto;
     z-index: 25;
+    padding: 0;
+    margin: 0;
 }
 
 .keyboard-row {
     display: flex;
     gap: clamp(3px, 0.5vw, 5px);
-    justify-content: center;
+    justify-content: flex-start;
+    padding: 0;
+    margin: 0;
 }
 
 .key-btn {
@@ -274,6 +278,8 @@ body {
     cursor: pointer;
     image-rendering: pixelated;
     box-shadow: 3px 3px 0 #000;
+    padding: 0;
+    margin: 0;
 }
 
 .key-btn:hover {
@@ -295,17 +301,20 @@ body {
     background: #44ff44;
 }
 
-/* Поле ввода - под задачей */
+/* Поле ввода - над клавиатурой */
 #input-container {
     position: absolute;
-    top: 55%;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: clamp(200px, 25vh, 300px);
+    right: clamp(10px, 2vw, 20px);
     pointer-events: auto;
+    width: 111px; /* 3 * 35px + 2 * 3px для средних экранов */
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
 }
 
 #answer-input {
-    width: clamp(150px, 20vw, 250px);
+    width: 100% !important;
     height: clamp(40px, 5vh, 60px);
     background: #fff;
     border: 3px solid #000;
@@ -313,6 +322,10 @@ body {
     font-size: clamp(14px, 2.5vw, 22px);
     text-align: center;
     image-rendering: pixelated;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    outline: none;
 }
 
 /* Экран загрузки */
@@ -451,6 +464,10 @@ body {
         font-size: 10px;
     }
     
+    .keyboard-row {
+        gap: 3px;
+    }
+    
     #timer-container {
         width: 200px;
         height: 25px;
@@ -466,7 +483,9 @@ body {
     }
     
     #input-container {
-        top: 50%;
+        bottom: 150px;
+        right: 5px;
+        width: 96px; /* 3 * 30px + 2 * 3px */
     }
 }
 
@@ -490,6 +509,16 @@ body {
         width: 60px;
         height: 60px;
         font-size: 16px;
+    }
+    
+    .keyboard-row {
+        gap: 5px;
+    }
+    
+    #input-container {
+        bottom: 300px;
+        right: 20px;
+        width: 190px; /* 3 * 60px + 2 * 5px */
     }
 }
 
