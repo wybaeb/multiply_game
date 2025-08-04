@@ -120,6 +120,11 @@ class Monster {
      * Автоматическое движение монстра
      */
     autoMove() {
+        // Если монстр видим, но не движется, запускаем движение
+        if (this.isVisibleNow() && !this.isMoving && this.currentState === 'idle') {
+            this.startWalking();
+        }
+        
         if (!this.isMoving) return;
 
         const currentLeft = parseFloat(this.element.style.left) || 75;

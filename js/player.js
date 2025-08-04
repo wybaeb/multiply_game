@@ -326,6 +326,10 @@ class Player {
         this.setPosition(20, 5);
         this.updateSpriteSize();
         this.animate('idle');
+        // Запускаем анимацию ходьбы после сброса
+        setTimeout(() => {
+            this.startWalking();
+        }, 100);
     }
 
     /**
@@ -357,6 +361,8 @@ class Player {
         
         setTimeout(() => {
             this.element.classList.remove('shake');
+            // Возвращаемся к ходьбе после анимации поражения
+            this.startWalking();
         }, 1000);
     }
 

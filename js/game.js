@@ -233,8 +233,13 @@ class GameEngine {
         this.timer = 60; // Сброс таймера
         window.monster.show();
 
-        // Останавливаем движение персонажа
+        // Останавливаем движение персонажа на короткое время
         window.player.stopWalking();
+        
+        // Запускаем движение персонажа снова через небольшую задержку
+        setTimeout(() => {
+            window.player.startWalking();
+        }, 500);
 
         // Генерируем задачу
         this.currentProblem = window.mathGame.generateProblem();

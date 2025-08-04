@@ -98,10 +98,21 @@ body {
     z-index: 15;
 }
 
+.sprite-element {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
 #player-sprite {
     width: clamp(240px, 30vw, 400px);
     height: clamp(240px, 30vw, 400px);
-    image-rendering: pixelated;
+    background-image: url('../sprites/hero/walk1.png');
 }
 
 #monster {
@@ -113,7 +124,7 @@ body {
 #monster-sprite {
     width: clamp(200px, 24vw, 320px);
     height: clamp(200px, 24vw, 320px);
-    image-rendering: pixelated;
+    background-image: url('../sprites/monstr1/walk1.png');
 }
 
 /* UI элементы - адаптивные */
