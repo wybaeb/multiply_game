@@ -143,8 +143,11 @@ class Monster {
         // Начальная позиция монстра (75%)
         const startPosition = 75;
         
-        // Позиция для атаки - монстр должен быть достаточно близко к герою
-        const attackPosition = playerCenter + 10; // 10% от центра героя
+        // Позиция для атаки - левая грань монстра заходит за правую грань героя наполовину ширины спрайта
+        // Правая грань героя = playerPosition + playerSpriteWidthPercent
+        // Левая грань монстра должна быть на playerPosition + playerSpriteWidthPercent - (ширина спрайта монстра / 2)
+        const monsterSpriteWidthPercent = (this.spriteSize.width / screenWidth) * 100;
+        const attackPosition = playerPosition + playerSpriteWidthPercent - (monsterSpriteWidthPercent / 2);
         
         // Вычисляем целевую позицию на основе времени
         let targetPosition;
@@ -453,8 +456,11 @@ class Monster {
         const playerSpriteWidthPercent = (playerSpriteWidth / screenWidth) * 100;
         const playerCenter = playerPosition + (playerSpriteWidthPercent / 2);
         
-        // Позиция для атаки - монстр должен быть достаточно близко к герою
-        const attackPosition = playerCenter + 10; // 10% от центра героя
+        // Позиция для атаки - левая грань монстра заходит за правую грань героя наполовину ширины спрайта
+        // Правая грань героя = playerPosition + playerSpriteWidthPercent
+        // Левая грань монстра должна быть на playerPosition + playerSpriteWidthPercent - (ширина спрайта монстра / 2)
+        const monsterSpriteWidthPercent = (this.spriteSize.width / screenWidth) * 100;
+        const attackPosition = playerPosition + playerSpriteWidthPercent - (monsterSpriteWidthPercent / 2);
         
         const currentLeft = parseFloat(this.element.style.left) || 75;
         
