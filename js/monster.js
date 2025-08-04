@@ -37,9 +37,9 @@ class Monster {
         const scaleY = screenHeight / baseHeight;
         const scale = Math.min(scaleX, scaleY);
         
-        // Базовый размер спрайта монстра
-        const baseSpriteSize = 100;
-        const spriteSize = Math.max(50, Math.min(100, baseSpriteSize * scale));
+        // Базовый размер спрайта монстра (увеличенный в 2 раза)
+        const baseSpriteSize = 320;
+        const spriteSize = Math.max(200, Math.min(320, baseSpriteSize * scale));
         
         return {
             width: spriteSize,

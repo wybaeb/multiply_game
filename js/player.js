@@ -35,9 +35,9 @@ class Player {
         const scaleY = screenHeight / baseHeight;
         const scale = Math.min(scaleX, scaleY);
         
-        // Базовый размер спрайта персонажа
-        const baseSpriteSize = 120;
-        const spriteSize = Math.max(60, Math.min(120, baseSpriteSize * scale));
+        // Базовый размер спрайта персонажа (увеличенный в 2 раза)
+        const baseSpriteSize = 400;
+        const spriteSize = Math.max(240, Math.min(400, baseSpriteSize * scale));
         
         return {
             width: spriteSize,

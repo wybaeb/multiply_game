@@ -46,7 +46,7 @@ body {
     left: 0;
     width: 200%;
     height: 100%;
-    background-size: 50% 100%;
+    background-size: auto 100%;
     background-repeat: repeat-x;
     background-position: 0 0;
     image-rendering: pixelated;
@@ -94,25 +94,25 @@ body {
 
 #player {
     left: 20%;
-    bottom: 20%;
+    bottom: calc(20% + 50px);
     z-index: 15;
 }
 
 #player-sprite {
-    width: clamp(60px, 8vw, 120px);
-    height: clamp(60px, 8vw, 120px);
+    width: clamp(240px, 30vw, 400px);
+    height: clamp(240px, 30vw, 400px);
     image-rendering: pixelated;
 }
 
 #monster {
     right: -150px;
-    bottom: 20%;
+    bottom: calc(20% + 50px);
     z-index: 14;
 }
 
 #monster-sprite {
-    width: clamp(50px, 6vw, 100px);
-    height: clamp(50px, 6vw, 100px);
+    width: clamp(200px, 24vw, 320px);
+    height: clamp(200px, 24vw, 320px);
     image-rendering: pixelated;
 }
 
@@ -461,13 +461,13 @@ body {
 
 @media screen and (min-width: 1200px) {
     #player-sprite {
-        width: 120px;
-        height: 120px;
+        width: 400px;
+        height: 400px;
     }
     
     #monster-sprite {
-        width: 100px;
-        height: 100px;
+        width: 320px;
+        height: 320px;
     }
     
     #keyboard {
