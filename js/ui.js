@@ -495,6 +495,15 @@ class GameUI {
             coin.style.setProperty('--end-y', `${endY - startY - randomOffsetY}px`);
         }, 100);
 
+        // Звуковой эффект для монеты
+        try {
+            const coinSound = new Audio('sprites/music/catch.mp3');
+            coinSound.volume = 0.3; // Уменьшаем громкость
+            coinSound.play().catch(e => console.log('Не удалось воспроизвести звук монеты:', e));
+        } catch (e) {
+            console.log('Ошибка создания звука монеты:', e);
+        }
+
         // Удаление монеты
         setTimeout(() => {
             if (coin.parentNode) {

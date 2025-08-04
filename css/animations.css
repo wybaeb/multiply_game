@@ -449,6 +449,11 @@
     .coin-spinning {
         background-size: contain !important;
     }
+    
+    /* Адаптация анимации монет для мобильных устройств */
+    .coin-fly {
+        animation: coin-fly-spin 0.6s ease-out forwards; /* Ускоряем анимацию на мобильных */
+    }
 }
 
 @media screen and (min-width: 1200px) {
@@ -466,5 +471,10 @@
     
     .coin-spinning {
         background-size: contain !important;
+    }
+    
+    /* Адаптация анимации монет для больших экранов */
+    .coin-fly {
+        animation: coin-fly-spin 1s ease-out forwards; /* Замедляем анимацию на больших экранах */
     }
 } 
