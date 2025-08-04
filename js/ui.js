@@ -100,13 +100,8 @@ class GameUI {
             this.elements.timerContainer.style.height = `${timerHeight}px`;
         }
         
-        // Обновляем размеры поля ввода
-        if (this.elements.answerInput) {
-            const inputWidth = Math.max(150, Math.min(250, screenWidth * 0.2));
-            const inputHeight = Math.max(40, Math.min(60, screenHeight * 0.05));
-            this.elements.answerInput.style.width = `${inputWidth}px`;
-            this.elements.answerInput.style.height = `${inputHeight}px`;
-        }
+        // Вычисляем ширину клавиатуры и применяем к полю ввода
+        this.updateInputWidth();
     }
 
     /**
@@ -345,6 +340,8 @@ class GameUI {
             this.elements.keyboard.classList.remove('hidden');
             this.elements.keyboard.classList.add('slide-in-right');
             this.isKeyboardVisible = true;
+            // Обновляем ширину поля ввода после показа клавиатуры
+            setTimeout(() => this.updateInputWidth(), 100);
         }
     }
 
@@ -370,6 +367,8 @@ class GameUI {
             this.elements.inputContainer.classList.remove('hidden');
             this.elements.inputContainer.classList.add('fade-in');
             this.isInputVisible = true;
+            // Обновляем ширину поля ввода
+            this.updateInputWidth();
         }
     }
 
@@ -678,6 +677,33 @@ class GameUI {
      */
     isInputShown() {
         return this.isInputVisible;
+    }
+
+    /**
+     * Обновление ширины поля ввода на основе ширины клавиатуры
+     */
+    updateInputWidth() {
+        if (this.elements.keyboard && this.elements.inputContainer) {
+            // Получаем первый ряд клавиатуры
+            const firstRow = this.elements.keyboard.querySelector('.keyboard-row');
+            if (firstRow) {
+                // Вычисляем ширину ряда (3 кнопки + 2 промежутка)
+                const buttons = firstRow.querySelectorAll('.key-btn');
+                if (buttons.length >= 3) {
+                    const buttonWidth = buttons[0].offsetWidth;
+                    const gap = parseFloat(getComputedStyle(firstRow).gap);
+                    const totalWidth = 3 * buttonWidth + 2 * gap;
+                    
+                    // Применяем ширину к контейнеру поля ввода
+                    this.elements.inputContainer.style.width = `${totalWidth}px`;
+                    
+                    // Убеждаемся, что поле ввода имеет тень
+                    if (this.elements.answerInput) {
+                        this.elements.answerInput.style.boxShadow = '3px 3px 0 #000';
+                    }
+                }
+            }
+        }
     }
 }
 

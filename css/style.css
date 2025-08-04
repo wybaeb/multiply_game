@@ -301,13 +301,13 @@ body {
     background: #44ff44;
 }
 
-/* Поле ввода - над клавиатурой */
+/* Поле ввода над клавиатурой */
 #input-container {
     position: absolute;
-    bottom: clamp(200px, 25vh, 300px);
+    bottom: calc(clamp(10px, 2vh, 20px) + 4 * clamp(35px, 5vw, 60px) + 3 * clamp(3px, 0.5vh, 5px));
     right: clamp(10px, 2vw, 20px);
     pointer-events: auto;
-    width: 100px; /* Уменьшено для точного выравнивания */
+    /* Ширина будет установлена через JavaScript */
     padding: 0;
     margin: 0;
     overflow: hidden;
@@ -315,17 +315,19 @@ body {
 
 #answer-input {
     width: 100% !important;
-    height: clamp(40px, 5vh, 60px);
+    height: clamp(35px, 5vw, 60px) !important;
     background: #fff;
     border: 3px solid #000;
     font-family: 'Press Start 2P', cursive;
-    font-size: clamp(14px, 2.5vw, 22px);
+    font-size: clamp(10px, 1.5vw, 16px);
     text-align: center;
     image-rendering: pixelated;
-    box-sizing: border-box !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
     outline: none;
+    box-shadow: 3px 3px 0 #000;
+    cursor: default;
 }
 
 /* Экран загрузки */
@@ -483,9 +485,14 @@ body {
     }
     
     #input-container {
-        bottom: 150px;
+        bottom: calc(5px + 4 * 30px + 3 * 3px);
         right: 5px;
-        width: 85px; /* Уменьшено для точного выравнивания */
+        /* Ширина будет установлена через JavaScript */
+    }
+    
+    #answer-input {
+        height: 30px;
+        font-size: 10px;
     }
 }
 
@@ -516,9 +523,14 @@ body {
     }
     
     #input-container {
-        bottom: 300px;
+        bottom: calc(20px + 4 * 60px + 3 * 5px);
         right: 20px;
-        width: 175px; /* Уменьшено для точного выравнивания */
+        /* Ширина будет установлена через JavaScript */
+    }
+    
+    #answer-input {
+        height: 60px;
+        font-size: 16px;
     }
 }
 
@@ -526,6 +538,30 @@ body {
 @media screen and (max-width: 768px) {
     #monster {
         right: -150px; /* Дальше от клавиатуры на мобильных */
+    }
+}
+
+/* Специальные стили для iPad */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    .key-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .keyboard-row {
+        gap: 3px;
+    }
+    
+    #input-container {
+        bottom: calc(15px + 4 * 32px + 3 * 3px);
+        right: 15px;
+        /* Ширина будет установлена через JavaScript */
+    }
+    
+    #answer-input {
+        height: 32px;
+        font-size: 12px;
     }
 }
 
