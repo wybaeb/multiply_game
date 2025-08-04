@@ -723,7 +723,7 @@ class GameUI {
             coin.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
             
             // Продолжаем анимацию если монета еще движется или время не истекло
-            if ((Math.abs(velocityY) > 0.5 || Math.abs(velocityX) > 0.5) && Date.now() - startTime < 5000) {
+            if ((Math.abs(velocityY) > 0.5 || Math.abs(velocityX) > 0.5) && Date.now() - startTime < 3000) {
                 requestAnimationFrame(animate);
             } else {
                 // Плавно исчезаем
