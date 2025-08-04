@@ -123,21 +123,21 @@
     background-position: center !important;
 }
 
-/* Параллакс движения - адаптивные скорости */
+/* Параллакс движения - четыре слоя с разными скоростями */
 .parallax-slow {
-    animation: parallax-slow 30s linear infinite;
+    animation: parallax-slow 40s linear infinite;
 }
 
 .parallax-medium {
-    animation: parallax-medium 20s linear infinite;
+    animation: parallax-medium 30s linear infinite;
 }
 
 .parallax-fast {
-    animation: parallax-fast 15s linear infinite;
+    animation: parallax-fast 20s linear infinite;
 }
 
 .parallax-very-fast {
-    animation: parallax-very-fast 10s linear infinite;
+    animation: parallax-very-fast 15s linear infinite;
 }
 
 /* Анимации UI - адаптивные */

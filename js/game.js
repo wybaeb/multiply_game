@@ -52,6 +52,9 @@ class GameEngine {
         window.gameUI.hideLoading();
         window.gameUI.showMenu();
 
+        // Запускаем параллакс для фона
+        window.gameUI.startParallax();
+
         this.gameState = 'MENU';
         console.log('Игра инициализирована');
     }

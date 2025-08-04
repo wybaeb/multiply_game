@@ -530,12 +530,19 @@ class GameUI {
             document.getElementById('bg-layer-4')
         ];
 
-        this.parallaxLayers.forEach((layer, index) => {
-            if (layer) {
-                const speed = 30 - (index * 5); // Разные скорости для слоев
-                layer.style.animation = `parallax-slow ${speed}s linear infinite`;
-            }
-        });
+        // Запускаем каждый слой с разной скоростью
+        if (this.parallaxLayers[0]) {
+            this.parallaxLayers[0].classList.add('parallax-slow'); // Самый медленный
+        }
+        if (this.parallaxLayers[1]) {
+            this.parallaxLayers[1].classList.add('parallax-medium'); // Медленный
+        }
+        if (this.parallaxLayers[2]) {
+            this.parallaxLayers[2].classList.add('parallax-fast'); // Быстрый
+        }
+        if (this.parallaxLayers[3]) {
+            this.parallaxLayers[3].classList.add('parallax-very-fast'); // Самый быстрый
+        }
     }
 
     /**
@@ -545,7 +552,7 @@ class GameUI {
         this.parallaxActive = false;
         this.parallaxLayers.forEach(layer => {
             if (layer) {
-                layer.style.animation = 'none';
+                layer.classList.remove('parallax-slow', 'parallax-medium', 'parallax-fast', 'parallax-very-fast');
             }
         });
     }
