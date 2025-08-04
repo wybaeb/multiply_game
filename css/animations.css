@@ -111,25 +111,25 @@
     }
 }
 
-/* Параллакс анимации - адаптивные скорости */
+/* Параллакс анимации - бесконечные без разрывов */
 @keyframes parallax-slow {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% { background-position-x: 0; }
+    100% { background-position-x: -100%; }
 }
 
 @keyframes parallax-medium {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% { background-position-x: 0; }
+    100% { background-position-x: -100%; }
 }
 
 @keyframes parallax-fast {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% { background-position-x: 0; }
+    100% { background-position-x: -100%; }
 }
 
 @keyframes parallax-very-fast {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% { background-position-x: 0; }
+    100% { background-position-x: -100%; }
 }
 
 /* Применение анимаций - адаптивные */
@@ -185,18 +185,22 @@
 /* Параллакс движения - четыре слоя с разными скоростями */
 .parallax-slow {
     animation: parallax-slow 40s linear infinite;
+    will-change: background-position;
 }
 
 .parallax-medium {
     animation: parallax-medium 30s linear infinite;
+    will-change: background-position;
 }
 
 .parallax-fast {
     animation: parallax-fast 20s linear infinite;
+    will-change: background-position;
 }
 
 .parallax-very-fast {
     animation: parallax-very-fast 15s linear infinite;
+    will-change: background-position;
 }
 
 /* Анимации UI - адаптивные */

@@ -10,6 +10,9 @@ class GameUI {
         this.isInputVisible = false;
         this.parallaxLayers = [];
         this.parallaxActive = false;
+        this.parallaxOffsets = [0, 0, 0, 0];
+        this.lastParallaxUpdate = null;
+        this.parallaxAnimation = null;
         this.bindEvents();
         this.initResizeHandler();
     }
@@ -840,19 +843,70 @@ class GameUI {
             document.getElementById('bg-layer-4')
         ];
 
-        // Запускаем каждый слой с разной скоростью
-        if (this.parallaxLayers[0]) {
-            this.parallaxLayers[0].classList.add('parallax-slow'); // Самый медленный
+        // Сбрасываем offset'ы
+        this.parallaxOffsets = [0, 0, 0, 0];
+        this.lastParallaxUpdate = null;
+
+        // Запускаем JavaScript управление параллаксом
+        this.startJavaScriptParallax();
+    }
+
+    /**
+     * JavaScript управление параллаксом с постоянно увеличивающимся offset
+     */
+    startJavaScriptParallax() {
+        if (!this.parallaxActive) return;
+        
+        // Скорости для каждого слоя (пикселей в секунду) - УВЕЛИЧЕНЫ В 8 РАЗ ОТ ИСХОДНЫХ
+        // Сохраняем ваши исходные скорости: 40s, 30s, 20s, 15s
+        const speeds = [16, 24, 32, 40]; // Медленный, средний, быстрый, очень быстрый (было 8, 12, 16, 20)
+        
+        // Запускаем анимацию
+        this.parallaxAnimation = requestAnimationFrame(() => {
+            this.updateParallax(speeds);
+        });
+    }
+
+    /**
+     * Обновление параллакса
+     */
+    updateParallax(speeds) {
+        if (!this.parallaxActive) return;
+        
+        const now = Date.now();
+        if (!this.lastParallaxUpdate) {
+            this.lastParallaxUpdate = now;
         }
-        if (this.parallaxLayers[1]) {
-            this.parallaxLayers[1].classList.add('parallax-medium'); // Медленный
+        
+        const deltaTime = (now - this.lastParallaxUpdate) / 1000; // в секундах
+        this.lastParallaxUpdate = now;
+        
+        // Обновляем позиции каждого слоя
+        this.parallaxLayers.forEach((layer, index) => {
+            if (layer) {
+                // Увеличиваем offset (никогда не обнуляем!)
+                this.parallaxOffsets[index] += speeds[index] * deltaTime;
+                
+                // Применяем позицию через background-position
+                layer.style.backgroundPosition = `${-this.parallaxOffsets[index]}px 0`;
+            }
+        });
+        
+        // Продолжаем анимацию
+        this.parallaxAnimation = requestAnimationFrame(() => {
+            this.updateParallax(speeds);
+        });
+    }
+
+    /**
+     * Остановка JavaScript параллакса
+     */
+    stopJavaScriptParallax() {
+        if (this.parallaxAnimation) {
+            cancelAnimationFrame(this.parallaxAnimation);
+            this.parallaxAnimation = null;
         }
-        if (this.parallaxLayers[2]) {
-            this.parallaxLayers[2].classList.add('parallax-fast'); // Быстрый
-        }
-        if (this.parallaxLayers[3]) {
-            this.parallaxLayers[3].classList.add('parallax-very-fast'); // Самый быстрый
-        }
+        this.lastParallaxUpdate = null;
     }
 
     /**
@@ -865,6 +919,9 @@ class GameUI {
                 layer.classList.remove('parallax-slow', 'parallax-medium', 'parallax-fast', 'parallax-very-fast');
             }
         });
+        
+        // Останавливаем JavaScript параллакс
+        this.stopJavaScriptParallax();
     }
 
     /**
