@@ -157,9 +157,9 @@ class Player {
         const gameObjectsRect = gameObjects.getBoundingClientRect();
         const playerRect = this.element.getBoundingClientRect();
         
-        // Позиция blast относительно game-objects (из центра героя)
+        // Позиция blast относительно game-objects (из центра героя, поднят на половину высоты)
         const blastX = playerRect.left - gameObjectsRect.left + playerRect.width / 2;
-        const blastY = playerRect.bottom - gameObjectsRect.bottom + playerRect.height / 2;
+        const blastY = playerRect.bottom - gameObjectsRect.bottom + playerRect.height / 2 + blastSize / 2;
         
         blast.style.cssText = `
             position: absolute;
@@ -253,9 +253,9 @@ class Player {
         const monsterCenterX = monsterRect.left - gameObjectsRect.left + monsterRect.width / 2;
         const monsterCenterY = monsterRect.bottom - gameObjectsRect.bottom + monsterRect.height / 2;
         
-        // Позиция взрыва (центр взрыва совпадает с центром монстра)
+        // Позиция взрыва (центр взрыва совпадает с центром монстра, поднят на половину высоты)
         const burstX = monsterCenterX;
-        const burstY = monsterCenterY;
+        const burstY = monsterCenterY + burstSize / 2;
         
         console.log('Центр монстра:', monsterCenterX, monsterCenterY);
         console.log('Позиция взрыва:', burstX, burstY, 'размер взрыва:', burstSize);
