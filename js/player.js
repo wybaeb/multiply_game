@@ -195,7 +195,7 @@ class Player {
             const blastY = blastRect.bottom - gameObjectsRect.bottom;
             
             // Вычисляем смещение для анимации (blast летит к центру монстра по горизонтали)
-            const endX = monsterX - blastX;
+            const endX = monsterX - blastX - blastSize / 2;
             const endY = 0; // Blast летит на той же высоте
             
             console.log('Blast летит от:', blastX, blastY, 'к:', monsterX, monsterY);
