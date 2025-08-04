@@ -445,16 +445,36 @@ class GameUI {
      * Анимация монет
      */
     animateCoins(count = 1) {
+        // Максимальное время анимации - 3 секунды
+        const maxAnimationTime = 3000;
+        
+        // Определяем время полета одной монеты в зависимости от размера экрана
+        let singleCoinFlightTime;
+        if (window.innerWidth <= 768) {
+            singleCoinFlightTime = 500; // Мобильные устройства
+        } else if (window.innerWidth >= 1200) {
+            singleCoinFlightTime = 700; // Большие экраны
+        } else {
+            singleCoinFlightTime = 600; // Средние экраны
+        }
+        
+        // Время анимации счетчика очков
+        const scoreAnimationDelay = 200;
+        
+        // Рассчитываем задержку между монетами так, чтобы общее время не превышало maxAnimationTime
+        const totalDelayTime = maxAnimationTime - singleCoinFlightTime - scoreAnimationDelay;
+        const delayBetweenCoins = Math.max(50, Math.floor(totalDelayTime / Math.max(1, count - 1)));
+        
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
                 this.createCoinAnimation();
-            }, i * 100);
+            }, i * delayBetweenCoins);
         }
         
         // Анимация счетчика очков в конце полета всех монет
         setTimeout(() => {
             this.animateScore();
-        }, (count * 100) + 800); // 800ms - время полета одной монеты
+        }, (count - 1) * delayBetweenCoins + singleCoinFlightTime + scoreAnimationDelay);
     }
 
     /**
@@ -541,7 +561,7 @@ class GameUI {
             if (coin.parentNode) {
                 coin.parentNode.removeChild(coin);
             }
-        }, 800);
+        }, 600); // Соответствует времени CSS анимации
     }
 
     /**
