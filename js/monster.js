@@ -213,11 +213,13 @@ class Monster {
             }, 300); // Задержка 300ms после начала атаки
         }
 
-        // Возврат к ходьбе через время анимации
+        // Возврат к ходьбе и отход после анимации
         setTimeout(() => {
             this.isAttacking = false;
             if (this.currentState === 'attacking') {
                 this.startWalking();
+                // Отходим назад от игрока
+                this.retreatFromPlayer();
             }
         }, 600);
 
@@ -463,11 +465,11 @@ class Monster {
         const playerSpriteWidthPercent = (playerSpriteWidth / screenWidth) * 100;
         const playerCenter = playerPosition + (playerSpriteWidthPercent / 2);
         
-        // Позиция для атаки - левая грань монстра заходит за правую грань героя наполовину ширины спрайта
-        // Правая грань героя = playerPosition + playerSpriteWidthPercent
-        // Левая грань монстра должна быть на playerPosition + playerSpriteWidthPercent - (ширина спрайта монстра / 2)
-        const monsterSpriteWidthPercent = (this.spriteSize.width / screenWidth) * 100;
-        const attackPosition = playerPosition + playerSpriteWidthPercent - (monsterSpriteWidthPercent / 2);
+        // Позиция для атаки - левая граница монстра должна быть равна левому краю героя + 1/4 ширины спрайта героя
+        // Левая граница героя = playerPosition
+        // 1/4 ширины спрайта героя = playerSpriteWidthPercent / 4
+        // Позиция атаки = левая граница героя + 1/4 ширины = playerPosition + (playerSpriteWidthPercent / 4)
+        const attackPosition = playerPosition + (playerSpriteWidthPercent / 4);
         
         const currentLeft = parseFloat(this.element.style.left) || 75;
         
@@ -508,6 +510,44 @@ class Monster {
         
         // Запускаем приближение
         requestAnimationFrame(approachPlayer);
+    }
+
+    /**
+     * Отход от игрока после атаки
+     */
+    retreatFromPlayer() {
+        const retreatPosition = 75; // Позиция отхода (исходная позиция монстра)
+        const currentLeft = parseFloat(this.element.style.left) || 75;
+        
+        // Если монстр уже достаточно далеко, останавливаемся
+        if (currentLeft >= retreatPosition) {
+            this.stopWalking();
+            return;
+        }
+        
+        // Функция для отхода от игрока
+        const retreatFromPlayer = () => {
+            const currentPos = parseFloat(this.element.style.left) || 75;
+            
+            if (currentPos < retreatPosition) {
+                const moveSpeed = this.moveSpeed || 2;
+                const moveStep = moveSpeed * 0.2; // Медленный отход
+                const newLeft = currentPos + moveStep;
+                
+                if (!isNaN(newLeft) && isFinite(newLeft)) {
+                    this.element.style.left = `${newLeft}%`;
+                    
+                    // Продолжаем отход
+                    requestAnimationFrame(retreatFromPlayer);
+                }
+            } else {
+                // Достигли позиции отхода, останавливаемся
+                this.stopWalking();
+            }
+        };
+        
+        // Запускаем отход
+        requestAnimationFrame(retreatFromPlayer);
     }
 }
 
