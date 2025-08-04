@@ -193,7 +193,7 @@ class Monster {
     /**
      * Атака
      */
-    attack() {
+    attack(penalty = null) {
         const now = Date.now();
         if (now - this.lastAttackTime < this.attackCooldownTime) {
             return false;
@@ -205,6 +205,13 @@ class Monster {
 
         // Анимация атаки
         this.animate('monster-attacking');
+
+        // Если есть штраф, запускаем анимацию монет через небольшую задержку
+        if (penalty) {
+            setTimeout(() => {
+                window.gameUI.animatePenaltyCoins(penalty);
+            }, 300); // Задержка 300ms после начала атаки
+        }
 
         // Возврат к ходьбе через время анимации
         setTimeout(() => {
@@ -448,7 +455,7 @@ class Monster {
     /**
      * Подбегание к игроку и атака
      */
-    approachAndAttack() {
+    approachAndAttack(penalty = null) {
         // Вычисляем позицию игрока
         const playerPosition = 20; // Позиция героя в процентах
         const playerSpriteWidth = this.spriteSize.width; // Ширина спрайта героя
@@ -466,7 +473,7 @@ class Monster {
         
         // Если монстр уже достаточно близко, сразу атакуем
         if (currentLeft <= attackPosition) {
-            this.attack();
+            this.attack(penalty);
             // Урон игроку
             window.player.takeMonsterDamage();
             return;
@@ -493,7 +500,7 @@ class Monster {
             } else {
                 // Достигли позиции атаки, атакуем
                 this.stopWalking();
-                this.attack();
+                this.attack(penalty);
                 // Урон игроку
                 window.player.takeMonsterDamage();
             }
