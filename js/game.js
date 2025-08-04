@@ -343,6 +343,9 @@ class GameEngine {
         // Анимация штрафа
         window.gameUI.animatePenalty(penalty);
         
+        // Анимация монет при штрафе
+        window.gameUI.animatePenaltyCoins(penalty);
+        
         // Анимации
         window.gameUI.animateWrongAnswer();
         
@@ -441,6 +444,9 @@ class GameEngine {
         
         // Анимация штрафа
         window.gameUI.animatePenalty(penalty);
+        
+        // Анимация монет при штрафе
+        window.gameUI.animatePenaltyCoins(penalty);
         
         // Монстр сначала подбегает к игроку, потом атакует
         window.monster.approachAndAttack();

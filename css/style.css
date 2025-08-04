@@ -617,4 +617,14 @@ body {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     pointer-events: none;
     z-index: 40;
+}
+
+/* Анимация монет при штрафе */
+.penalty-coin-animation {
+    animation: penalty-coin-spin 1s linear infinite;
+}
+
+@keyframes penalty-coin-spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 } 

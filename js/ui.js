@@ -611,6 +611,88 @@ class GameUI {
     }
 
     /**
+     * Анимация монет при штрафе
+     */
+    animatePenaltyCoins(penalty) {
+        // Вычисляем количество монет: штраф деленный на 5
+        const coinCount = Math.floor(penalty / 5);
+        
+        // Получаем позицию игрока для начала анимации
+        const playerElement = document.getElementById('player');
+        let startX, startY;
+        
+        if (playerElement) {
+            const playerRect = playerElement.getBoundingClientRect();
+            startX = playerRect.left + playerRect.width / 2;
+            startY = playerRect.top + playerRect.height / 2;
+        } else {
+            // Fallback позиции
+            startX = window.innerWidth * 0.2; // 20% от ширины экрана
+            startY = window.innerHeight * 0.6; // 60% от высоты экрана
+        }
+        
+        // Создаем все монеты одновременно
+        for (let i = 0; i < coinCount; i++) {
+            this.createPenaltyCoinAnimation(startX, startY);
+        }
+    }
+
+    /**
+     * Создание анимации монеты при штрафе
+     */
+    createPenaltyCoinAnimation(startX, startY) {
+        const coin = document.createElement('div');
+        coin.className = 'penalty-coin-animation';
+        
+        // Адаптивный размер монеты
+        const coinSize = Math.max(20, Math.min(40, Math.min(window.innerWidth, window.innerHeight) / 30));
+        
+        // Случайный спрайт монеты
+        const coinSprites = ['coin1.png', 'coin2.png', 'coin3.png', 'coin4.png', 'coin5.png'];
+        const randomSprite = coinSprites[Math.floor(Math.random() * coinSprites.length)];
+        
+        // Случайное направление полета вверх и в стороны
+        const angle = (Math.random() - 0.5) * Math.PI; // от -90 до +90 градусов (только вверх)
+        const distance = 150 + Math.random() * 100; // 150-250px
+        const endX = startX + Math.cos(angle) * distance;
+        const endY = startY - Math.abs(Math.sin(angle) * distance) - 100; // Всегда вверх
+        
+        coin.style.cssText = `
+            position: fixed;
+            width: ${coinSize}px;
+            height: ${coinSize}px;
+            background-image: url('sprites/coin/${randomSprite}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 35;
+            left: ${startX}px;
+            top: ${startY}px;
+            transform: translate(-50%, -50%);
+            image-rendering: pixelated;
+            opacity: 1;
+        `;
+
+        document.body.appendChild(coin);
+
+        // Анимация полета монеты вверх
+        setTimeout(() => {
+            coin.style.transition = 'all 1s ease-out';
+            coin.style.left = `${endX}px`;
+            coin.style.top = `${endY}px`;
+            coin.style.opacity = '0';
+            coin.style.transform = 'translate(-50%, -50%) rotate(360deg)';
+        }, 50);
+
+        // Удаление монеты
+        setTimeout(() => {
+            if (coin.parentNode) {
+                coin.parentNode.removeChild(coin);
+            }
+        }, 1100);
+    }
+
+    /**
      * Показ персонажа
      */
     showPlayer() {
