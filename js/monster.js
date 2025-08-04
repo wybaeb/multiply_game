@@ -206,6 +206,15 @@ class Monster {
         // Анимация атаки
         this.animate('monster-attacking');
 
+        // Воспроизведение звука атаки
+        try {
+            const attackSound = new Audio('sprites/music/attack.mp3');
+            attackSound.volume = 0.5; // Умеренная громкость
+            attackSound.play().catch(e => console.log('Не удалось воспроизвести звук атаки:', e));
+        } catch (e) {
+            console.log('Ошибка создания звука атаки:', e);
+        }
+
         // Если есть штраф, запускаем анимацию монет через небольшую задержку
         if (penalty) {
             setTimeout(() => {
