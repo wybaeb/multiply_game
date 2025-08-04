@@ -125,19 +125,64 @@ class Monster {
             this.startWalking();
         }
         
-        if (!this.isMoving) return;
 
-        const currentLeft = parseFloat(this.element.style.left) || 75;
-        const targetLeft = 65; // Позиция для атаки - не заходит за клавиатуру
-
-        if (currentLeft > targetLeft) {
-            const newLeft = currentLeft - this.moveSpeed;
-            this.element.style.left = `${newLeft}%`;
+        
+        // Получаем оставшееся время из игрового движка
+        const remainingTime = window.gameEngine ? window.gameEngine.getRemainingTime() : 60;
+        const maxTime = 60; // Максимальное время таймера
+        
+        // Вычисляем позицию монстра на основе оставшегося времени
+        // Когда время = 0, монстр должен зайти на середину героя
+        // Позиция героя примерно 20%, середина героя = 20% + (размер спрайта / 2)
+        const playerPosition = 20; // Позиция героя в процентах
+        const playerSpriteWidth = this.spriteSize.width; // Ширина спрайта героя
+        const screenWidth = window.innerWidth;
+        const playerSpriteWidthPercent = (playerSpriteWidth / screenWidth) * 100;
+        const playerCenter = playerPosition + (playerSpriteWidthPercent / 2);
+        
+        // Начальная позиция монстра (75%)
+        const startPosition = 75;
+        
+        // Вычисляем целевую позицию на основе времени
+        let targetPosition;
+        if (remainingTime <= 0) {
+            // Когда время истекло, монстр заходит на середину героя
+            // Левая граница монстра = центр героя
+            targetPosition = playerCenter;
+        } else {
+            // Пропорциональное приближение
+            const timeProgress = (maxTime - remainingTime) / maxTime; // 0 до 1
+            const distanceToPlayer = startPosition - playerCenter;
+            targetPosition = startPosition - (distanceToPlayer * timeProgress);
+        }
+        
+        const currentLeft = parseFloat(this.element.style.left) || startPosition;
+        
+        // Плавное движение к целевой позиции
+        if (Math.abs(currentLeft - targetPosition) > 0.1) {
+            const moveSpeed = this.moveSpeed || 2; // Значение по умолчанию
+            const moveStep = moveSpeed * 0.1; // Уменьшаем скорость для плавности
+            let newLeft;
             
-            if (newLeft <= targetLeft) {
-                this.stopWalking();
-                this.attack();
+            if (currentLeft > targetPosition) {
+                newLeft = currentLeft - moveStep;
+            } else {
+                newLeft = currentLeft + moveStep;
             }
+            
+            // Проверяем, что newLeft не NaN
+            if (!isNaN(newLeft) && isFinite(newLeft)) {
+                this.element.style.left = `${newLeft}%`;
+                console.log(`Monster: time=${remainingTime}, moved from ${currentLeft.toFixed(1)}% to ${newLeft.toFixed(1)}% (target: ${targetPosition.toFixed(1)}%)`);
+            } else {
+                console.error(`Invalid newLeft value: ${newLeft}, currentLeft: ${currentLeft}, moveStep: ${moveStep}, moveSpeed: ${this.moveSpeed}`);
+            }
+        }
+        
+        // Если время истекло и монстр достиг позиции героя, атакуем
+        if (remainingTime <= 0 && currentLeft <= playerCenter) {
+            this.stopWalking();
+            this.attack();
         }
     }
 
@@ -326,6 +371,7 @@ class Monster {
         this.updateSpriteSize();
         this.animate('idle');
         this.element.classList.remove('monster-appear', 'monster-disappear');
+        this.element.style.left = '75%'; // Явно устанавливаем начальную позицию
     }
 
     /**

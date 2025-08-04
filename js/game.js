@@ -234,6 +234,9 @@ class GameEngine {
         this.combatActive = true;
         this.timer = 60; // Сброс таймера
         this.lastAnswerCorrect = false; // Сбрасываем флаг правильности ответа
+        
+        // Сбрасываем позицию монстра на начальную
+        window.monster.setPosition(75, 5);
         window.monster.show();
 
         // Останавливаем движение персонажа на короткое время
