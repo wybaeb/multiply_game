@@ -420,6 +420,11 @@ class GameUI {
                 this.createCoinAnimation();
             }, i * 100);
         }
+        
+        // Анимация счетчика очков в конце полета всех монет
+        setTimeout(() => {
+            this.animateScore();
+        }, (count * 100) + 800); // 800ms - время полета одной монеты
     }
 
     /**
@@ -461,11 +466,15 @@ class GameUI {
         const randomOffsetX = (Math.random() - 0.5) * 20;
         const randomOffsetY = (Math.random() - 0.5) * 20;
         
+        // Случайный начальный спрайт монеты для разнообразия
+        const coinSprites = ['coin1.png', 'coin2.png', 'coin3.png', 'coin4.png', 'coin5.png'];
+        const randomSprite = coinSprites[Math.floor(Math.random() * coinSprites.length)];
+        
         coin.style.cssText = `
             position: fixed;
             width: ${coinSize}px;
             height: ${coinSize}px;
-            background-image: url('sprites/coin/coin1.png');
+            background-image: url('sprites/coin/${randomSprite}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
